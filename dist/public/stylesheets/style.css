@@ -1,0 +1,11 @@
+body {
+  padding: 0 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #F8F5F0;
+}
+.content{
+  margin-top: 50px;
+}
+.navbar-nav > .nav-item > .nav-link {
+  font-size: 18px;
+}

@@ -1,0 +1,22 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    {% if error is defined %}
+        <p>{{ error }}</p>
+    {% endif %}
+    <h2>Sign up form</h2>
+    <div class="signup-form">
+        <form action="/users/signup" method="post">
+
+            <input type="text" placeholder="Username" name="username" class="form-control" required> <br><br>
+
+            <input type="email" placeholder="Email" name="email" class="form-control" required> <br><br>
+
+            <input type="password" placeholder="Password" name="password" class="form-control" required> <br><br>
+
+            <input type="password" placeholder="Confirm password" name="password_conf" class="form-control" required> <br><br>
+
+            <input type="submit" value="Sign up!" class="btn btn-success">
+        </form>
+    </div>
+{% endblock %}
