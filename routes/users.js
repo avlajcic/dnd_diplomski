@@ -1,4 +1,3 @@
-//mongod --port 27017 --dbpath=./data
 let express = require('express');
 let router = express.Router();
 let bodyParser = require("body-parser");
@@ -8,7 +7,7 @@ let validator = require('validator');
 //DB
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-let dbUrl = 'mongodb://localhost:27017/dnd';
+let dbUrl = process.env.DB_URL;
 mongoose.connect(dbUrl, {useMongoClient: true});
 
 //Models
