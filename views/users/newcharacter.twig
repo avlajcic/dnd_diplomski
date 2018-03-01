@@ -1,0 +1,306 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <h1>New character</h1>
+    <form id="newCharForm" method="post" action="#">
+        <div class="tab">
+            <div class="row">
+                <div class="col-10">
+                    <label for="char-name">Name</label>
+                    <input class="form-control" type="text" id="char-name" name="name" placeholder="Enter your name...">
+                    <br>
+
+                    <label for="char-race">Race</label>
+                    <select class="form-control" id="char-race" name="race" onchange="changeRace()">
+                        {% for race in races %}
+                            <option
+                                    {% if loop.index0 == 0 %}
+                                        selected
+                                    {% endif %}
+                                    value="{{ race.name }}" data-index="{{ loop.index0 }}">
+                                {{ race.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <div id="race-info">
+                        <p><b>Speed:</b> {{ races[0].speed }}</p>
+                        <p><b>Size:</b> {{ races[0].size }}</p>
+                        <p><b>Ability increase:</b> {{ races[0].abilityIncrease }}</p>
+                        <p><b>Languages:</b> {{ races[0].languages }}</p>
+                        <p><b>Bonuses:</b> <br>{{ races[0].bonuses|nl2br }}</p>
+                    </div>
+
+                    <label for="char-class">Class</label>
+                    <select class="form-control" id="char-class" name="class" onchange="changeClass()">
+                        {% for class in classes %}
+                            <option value="{{ class.name }}">{{ class.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <div id="class-info">
+                        <p><b>Hit dice:</b> {{ classes[0].hitDice }}</p>
+                        <p><b>Armor:</b> {{ classes[0].armor }}</p>
+                        <p><b>Weapons:</b> {{ classes[0].weapons }}</p>
+                        <p><b>Tools:</b> {{ classes[0].tools }}</p>
+                        <p><b>Saving throws:</b> {{ classes[0].savingThrows }}</p>
+                        <p><b>Skills:</b> {{ classes[0].skills }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab">
+
+                <div class="row">
+                    <div class="col">
+                        <div id="race-ability-info">
+                            <p><b>Race ability increase: </b> {{ races[0].abilityIncrease }} </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="offset-md-1 offset-lg-0 col">
+                        <div class="row">
+                            <div class="col-4 col-lg-2">
+                                <label for="char-str">Strength</label>
+                                <input class="form-control" type="number" id="char-str" name="strength" min="0" max="30"
+                                       value="10" onchange="changeSkill('str')">
+                            </div>
+                            <div class="col-4 col-lg-2">
+                                <label for="char-dex">Dexterity</label>
+                                <input class="form-control" type="number" id="char-dex" name="dexterity" min="0" max="30"
+                                       value="10" onchange="changeSkill('dex')">
+                            </div>
+                            <div class="col-4 col-lg-2">
+                                <label for="char-con">Constitution</label>
+                                <input class="form-control" type="number" id="char-con" name="constitution" min="0" max="30"
+                                       value="10" onchange="changeSkill('con')">
+                            </div>
+                            <div class="col-4 col-lg-2">
+                                <label for="char-int">Intelligence</label>
+                                <input class="form-control" type="number" id="char-int" name="intelligence" min="0" max="30"
+                                       value="10" onchange="changeSkill('int')">
+                            </div>
+                            <div class="col-4 col-lg-2">
+                                <label for="char-wis">Wisdom</label>
+                                <input class="form-control" type="number" id="char-wis" name="wisdom" min="0" max="30"
+                                       value="10" onchange="changeSkill('wis')">
+                            </div>
+                            <div class="col-4 col-lg-2">
+                                <label for="char-cha">Charisma</label>
+                                <input class="form-control" type="number" id="char-cha" name="charisma" min="0" max="30"
+                                       value="10" onchange="changeSkill('cha')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-6 col-md-3 skills-div">
+                        <input type="checkbox" name="strength_proficiency" id="strength_proficiency">
+                        <label>Strength: </label>
+                        <span id="strength-saving-throw" data-skill="str" data-slug="strength_proficiency" class="skill-element">0</span>
+                        <br>
+
+                        <input type="checkbox" name="dexterity_proficiency" id="dexterity_proficiency">
+                        <label>Dexterity: </label>
+                        <span id="dexterity-saving-throw" data-skill="dex" data-slug="dexterity_proficiency" class="skill-element">0</span>
+                        <br>
+
+                        <input type="checkbox" name="constitution_proficiency" id="constitution_proficiency">
+                        <label>Constitution: </label>
+                        <span id="constitution-saving-throw" data-skill="con" data-slug="constitution_proficiency" class="skill-element">0</span>
+                        <br>
+
+                        <input type="checkbox" name="intelligence_proficiency" id="intelligence_proficiency">
+                        <label>Intelligence: </label>
+                        <span id="intelligence-saving-throw" data-skill="int" data-slug="intelligence_proficiency" class="skill-element">0</span>
+                        <br>
+
+                        <input type="checkbox" name="wisdom_proficiency" id="wisdom_proficiency">
+                        <label>Wisdom: </label>
+                        <span id="wisdom-saving-throw" data-skill="wis" data-slug="wisdom_proficiency" class="skill-element">0</span>
+                        <br>
+
+                        <input type="checkbox" name="charisma_proficiency" id="charisma_proficiency">
+                        <label>Charisma: </label>
+                        <span id="charisma-saving-throw" data-skill="cha" data-slug="charisma_proficiency" class="skill-element">0</span>
+                        <br>
+                    </div>
+                    {% for skill in skills %}
+                        {% if loop.index0 % 6 == 0 %}
+                            <div class="col-6 col-md-3 skills-div">
+                        {% endif %}
+                            <input type="checkbox" name="{{ skill.slug }}" id="{{ skill.slug }}_proficiency">
+                            <label>{{ skill.name }}: </label>
+                            <span data-skill="{{ skill.bonus }}"  data-slug="{{ skill.slug }}_proficiency" class="skill-element">0</span>
+                            <br>
+                        {% if loop.index0 % 6 == 5 %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+
+            <div class="row">
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col">
+                            <div id="class-hitDice-info">
+                                <p><b>Class hit dice: </b> {{ classes[0].hitDice }} </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="char-level">Level</label>
+                            <input class="form-control" type="number" id="char-level" name="level" min="1" value="1">
+                            <br>
+                            <label for="char-hp">Health points</label>
+                            <input class="form-control" type="number" id="char-hp" name="hp" min="0" value="{{ classes[0].hitDice [2:] }}">
+                            <br>
+                            <label for="char-ac">Armor class</label>
+                            <input class="form-control" type="number" id="char-ac" name="ac" min="0" value="10">
+                            <br>
+                        </div>
+                        <div class="col-4">
+                            <label for="char-proficiency">Proficiency</label>
+                            <input class="form-control" type="number" id="char-proficiency" name="proficiency" min="2" value="2">
+                            <br>
+                        </div>
+                        <div class="col-4">
+                            <label for="char-gold">Gold</label>
+                            <input class="form-control" type="number" id="char-gold" name="gold" min="0" value="0">
+                            <br>
+                            <label for="char-silver">Silver</label>
+                            <input class="form-control" type="number" id="char-silver" name="silver" min="0" value="0">
+                            <br>
+                            <label for="char-copper">Copper</label>
+                            <input class="form-control" type="number" id="char-copper" name="copper" min="0" value="0">
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div style="overflow:auto;" class="offset-sm-8">
+        <div>
+            <button type="button" id="prevBtn" class="btn btn-default" onclick="nextPrev(-1)">Previous</button>
+            <button type="button" id="nextBtn" class="btn btn-success" onclick="nextPrev(1)">Next</button>
+        </div>
+    </div>
+
+
+
+    <script>
+        function changeRace() {
+            let raceSelect = document.getElementById('char-race');
+            let raceInfo = document.getElementById('race-info');
+            let raceAbilityInfo = document.getElementById('race-ability-info');
+            let index = raceSelect.selectedIndex;
+            let races = {{ races|json_encode|raw }};
+            let selectedRace = races[index]._doc;
+
+            raceInfo.innerHTML = '<p><b>Speed:</b> ' + selectedRace.speed + '</p>\n' +
+                '<p><b>Size:</b> ' + selectedRace.size + '</p>\n' +10
+                '<p><b>Ability increase:</b> ' + selectedRace.abilityIncrease + '</p>\n' +
+                '<p><b>Languages:</b> ' + selectedRace.languages + '</p>\n' +
+                '<p><b>Bonuses:</b> <br>' + selectedRace.bonuses.replace(/\n/g, "<br />") + '</p>';
+
+            raceAbilityInfo.innerHTML = '<p><b>Race ability increase: </b>' + selectedRace.abilityIncrease + '</p>';
+
+        }
+
+        function changeClass() {
+            let classSelect = document.getElementById('char-class');
+            let classInfo = document.getElementById('class-info');
+            let classHitDiceInfo = document.getElementById('class-hitDice-info');
+            let classHp = document.getElementById('char-hp');
+            let index = classSelect.selectedIndex;
+            let classes = {{ classes|json_encode|raw }};
+            let selectedClass = classes[index]._doc;
+            classInfo.innerHTML = '<p><b>Hit dice:</b> ' + selectedClass.hitDice + '</p>\n' +
+                '<p><b>Armor:</b> ' + selectedClass.armor + '</p>\n' +
+                '<p><b>Weapons:</b> ' + selectedClass.weapons + '</p>\n' +
+                '<p><b>Tools:</b> ' + selectedClass.tools + '</p>\n' +
+                '<p><b>Saving throws:</b> ' + selectedClass.savingThrows + '</p>\n' +
+                '<p><b>Skills:</b>' + selectedClass.skills + '</p>';
+
+            classHitDiceInfo.innerHTML = '<p><b>Class hit dice: </b>' + selectedClass.hitDice + '</p>';
+            classHp.value = selectedClass.hitDice.substr(2);
+        }
+
+        function changeSkill(skillName) {
+            let inputElement = document.getElementById('char-' + skillName);
+            let modifier = Math.floor((parseInt(inputElement.value) - 10) / 2);
+            let skills = document.getElementsByClassName('skill-element');
+            let proficiency = parseInt(document.getElementById('char-proficiency').value);
+
+            for (let i = 0; i < skills.length; i++) {
+                if (skillName === skills[i].getAttribute('data-skill')) {
+                    let proficiencyElementId = skills[i].getAttribute('data-slug');
+                    let proficiencyCheckbox = document.getElementById(proficiencyElementId);
+                    let bonusProficiency = 0;
+                    if (proficiencyCheckbox.checked){
+                        bonusProficiency = proficiency;
+                    }
+                    skills[i].innerHTML = (modifier + proficiency > 0 ? '+' + (modifier + bonusProficiency) : (modifier + bonusProficiency));
+                }
+            }
+        }
+
+        let currentTab = 0;
+        showTab(currentTab);
+
+        function showTab(n) {
+            let tabs = document.getElementsByClassName("tab");
+            tabs[n].style.display = "block";
+            if (n === 0) {
+                document.getElementById("prevBtn").style.display = "none";
+            } else {
+                document.getElementById("prevBtn").style.display = "inline";
+            }
+            if (n === (tabs.length - 1)) {
+                document.getElementById("nextBtn").innerHTML = "Submit";
+            } else {
+                document.getElementById("nextBtn").innerHTML = "Next";
+            }
+        }
+
+        function nextPrev(n) {
+            let tabs = document.getElementsByClassName("tab");
+            if (n === 1 && !validateForm()) return false;
+
+            tabs[currentTab].style.display = "none";
+            currentTab = currentTab + n;
+            if (currentTab >= tabs.length) {
+                document.getElementById("newCharForm").submit();
+                return false;
+            }
+            showTab(currentTab);
+        }
+
+        function validateForm() {
+            let tabs, y, i, valid = true;
+            tabs = document.getElementsByClassName("tab");
+            y = tabs[currentTab].getElementsByTagName("input");
+
+            for (i = 0; i < y.length; i++) {
+                if (y[i].value === "") {
+                    y[i].className += " invalid";
+                    valid = false;
+                }
+            }
+
+            if (valid) {
+                for (i = 0; i < y.length; i++) {
+                    y[i].className = y[i].className.replace(" invalid", "");
+                }
+            }
+            return valid;
+        }
+    </script>
+
+
+{% endblock %}

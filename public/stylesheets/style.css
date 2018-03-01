@@ -9,3 +9,27 @@ body {
 .navbar-nav > .nav-item > .nav-link {
   font-size: 18px;
 }
+
+.profile-tab{
+  width:100%;
+  height: 250px;
+  text-align: center;
+}
+
+.tab{
+  width: 100%;
+  display: none;
+  transition: all .2s ease-in-out;
+}
+
+input[type=number]{
+  width: 60px;
+}
+
+input.invalid {
+  background-color: #ffdddd;
+}
+
+.skills-div{
+  margin-top: 10px;
+}
