@@ -1,20 +1,21 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-  <h1>{{user.username}}'s characters</h1>
+  <h1>{{user.username}}'s items</h1>
 
   <div class="row">
     <div class="col-sm-6">
-      <a href="/users/newcharacter" class="profile-tab">
+      <a href="/users/newitem" class="profile-tab">
         <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
-        <h3>New character</h3>
+        <h3>New item</h3>
       </a>
     </div>
   </div>
-    {% if characters is defined %}
+    {% if items is defined %}
+      {#items#}
       <ul>
-          {% for character in characters %}
-            <li>{{ character.name|e }}</li>
+          {% for item in items %}
+            <li>{{ item.name|e }}</li>
           {% endfor %}
       </ul>
     {% endif %}

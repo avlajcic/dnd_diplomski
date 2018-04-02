@@ -17,6 +17,7 @@ var User = require('../models/user');
 var Race = require('../models/characters/race');
 var Class = require('../models/characters/class');
 var Skill = require('../models/characters/skill');
+var Item = require('../models/item');
 
 var app = express();
 
@@ -145,13 +146,42 @@ router.get('/mycharacters', isAuthenticated, function (req, res, next) {
     res.render('users/mycharacters', { user: req.session.user });
 });
 
-router.get('/newcharacter', isAuthenticated, function (req, res, next) {
-    Promise.all([Race.find(), Class.find(), Skill.find({ savingThrow: false })]).then(function (doc) {
-        doc[2].sort(compareNames);
-        res.render('users/newcharacter', { races: doc[0], classes: doc[1], skills: doc[2], user: req.session.user });
+router.get('/myitems', isAuthenticated, function (req, res, next) {
+
+    Item.find({ user: req.session.user }).then(function (items) {
+        res.render('users/myitems', { user: req.session.user, items: items });
     }).catch(function (err) {
-        console.log(err.message);
+        res.render('users/myitems', { user: req.session.user, error: 'Problem with retrieving items.' });
     });
+});
+
+router.get('/newcharacter', isAuthenticated, function (req, res, next) {
+    Promise.all([Race.find(), Class.find(), Skill.find({ savingThrow: false }), Item.find().sort({ name: 1 })]).then(function (doc) {
+        doc[2].sort(compareNames);
+        res.render('users/newcharacter', { races: doc[0], classes: doc[1], skills: doc[2], items: doc[3], user: req.session.user });
+    }).catch(function (err) {});
+});
+
+router.get('/newitem', isAuthenticated, function (req, res, next) {
+    res.render('users/newitem', { user: req.session.user });
+});
+
+router.post('/character', isAuthenticated, function (req, res) {
+    res.send(req.body);
+});
+
+router.post('/item', isAuthenticated, function (req, res) {
+    if (!validator.isEmpty(req.body.name) && !validator.isEmpty(req.body.type) && !validator.isEmpty(req.body.description)) {
+        var item = new Item({
+            name: req.body.name,
+            type: req.body.type,
+            description: req.body.description,
+            user: req.session.user
+        });
+        item.save().then(function () {
+            res.redirect('/users/myitems');
+        });
+    } else {}
 });
 
 module.exports = router;

@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1>New character</h1>
-    <form id="newCharForm" method="post" action="#">
+    <form id="newCharForm" method="post" action="/users/character">
         <div class="tab">
             <div class="row">
                 <div class="col-10">
@@ -131,7 +131,7 @@
                         {% if loop.index0 % 6 == 0 %}
                             <div class="col-6 col-md-3 skills-div">
                         {% endif %}
-                            <input type="checkbox" name="{{ skill.slug }}" id="{{ skill.slug }}_proficiency">
+                            <input type="checkbox" name="skills" id="{{ skill.slug }}_proficiency" value="{{ skill.name }}">
                             <label>{{ skill.name }}: </label>
                             <span data-skill="{{ skill.bonus }}"  data-slug="{{ skill.slug }}_proficiency" class="skill-element">0</span>
                             <br>
@@ -183,6 +183,20 @@
                 </div>
             </div>
         </div>
+        <div class="tab">
+            <div class="row">
+                <div class="col-10">
+                    <input type="text" placeholder="Filter items" class="form-control">
+
+                    <ul>
+                        {% for item in items %}
+                            <label>{{ item.name }}</label><br>
+                            <input type="checkbox" name="item[]" class="item-checkbox" value="{{ item._id }}">
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
     </form>
     <div style="overflow:auto;" class="offset-sm-8">
         <div>
@@ -203,7 +217,7 @@
             let selectedRace = races[index]._doc;
 
             raceInfo.innerHTML = '<p><b>Speed:</b> ' + selectedRace.speed + '</p>\n' +
-                '<p><b>Size:</b> ' + selectedRace.size + '</p>\n' +10
+                '<p><b>Size:</b> ' + selectedRace.size + '</p>\n' +
                 '<p><b>Ability increase:</b> ' + selectedRace.abilityIncrease + '</p>\n' +
                 '<p><b>Languages:</b> ' + selectedRace.languages + '</p>\n' +
                 '<p><b>Bonuses:</b> <br>' + selectedRace.bonuses.replace(/\n/g, "<br />") + '</p>';

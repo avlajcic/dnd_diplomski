@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1>New character</h1>
-    <form id="newCharForm" method="post" action="#">
+    <form id="newCharForm" method="post" action="/users/character">
         <div class="tab">
             <div class="row">
                 <div class="col-10">
@@ -97,43 +97,43 @@
                 <br>
                 <div class="row">
                     <div class="col-6 col-md-3 skills-div">
-                        <input type="checkbox" name="strength_proficiency">
+                        <input type="checkbox" name="strength_proficiency" id="strength_proficiency">
                         <label>Strength: </label>
-                        <span id="strength-saving-throw" data-skill="str" class="skill-element">0</span>
+                        <span id="strength-saving-throw" data-skill="str" data-slug="strength_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="dexterity_proficiency">
+                        <input type="checkbox" name="dexterity_proficiency" id="dexterity_proficiency">
                         <label>Dexterity: </label>
-                        <span id="dexterity-saving-throw" data-skill="str" class="skill-element">0</span>
+                        <span id="dexterity-saving-throw" data-skill="dex" data-slug="dexterity_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="constitution_proficiency">
+                        <input type="checkbox" name="constitution_proficiency" id="constitution_proficiency">
                         <label>Constitution: </label>
-                        <span id="constitution-saving-throw" data-skill="str" class="skill-element">0</span>
+                        <span id="constitution-saving-throw" data-skill="con" data-slug="constitution_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="intelligence_proficiency">
+                        <input type="checkbox" name="intelligence_proficiency" id="intelligence_proficiency">
                         <label>Intelligence: </label>
-                        <span id="intelligence-saving-throw" data-skill="str" class="skill-element">0</span>
+                        <span id="intelligence-saving-throw" data-skill="int" data-slug="intelligence_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="wisdom_proficiency">
+                        <input type="checkbox" name="wisdom_proficiency" id="wisdom_proficiency">
                         <label>Wisdom: </label>
-                        <span id="wisdom-saving-throw" data-skill="str" class="skill-element">0</span>
+                        <span id="wisdom-saving-throw" data-skill="wis" data-slug="wisdom_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="charisma_proficiency">
+                        <input type="checkbox" name="charisma_proficiency" id="charisma_proficiency">
                         <label>Charisma: </label>
-                        <span id="charisma-saving-throw" data-skill="str" class="skill-element">0</span>
+                        <span id="charisma-saving-throw" data-skill="cha" data-slug="charisma_proficiency" class="skill-element">0</span>
                         <br>
                     </div>
                     {% for skill in skills %}
                         {% if loop.index0 % 6 == 0 %}
                             <div class="col-6 col-md-3 skills-div">
                         {% endif %}
-                            <input type="checkbox" name="{{ skill.slug }}">
+                            <input type="checkbox" name="{{ skill.slug }}" id="{{ skill.slug }}_proficiency">
                             <label>{{ skill.name }}: </label>
-                            <span data-skill="{{ skill.bonus }}" class="skill-element">0</span>
+                            <span data-skill="{{ skill.bonus }}"  data-slug="{{ skill.slug }}_proficiency" class="skill-element">0</span>
                             <br>
                         {% if loop.index0 % 6 == 5 %}
                             </div>
@@ -152,7 +152,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-4">
                             <label for="char-level">Level</label>
                             <input class="form-control" type="number" id="char-level" name="level" min="1" value="1">
                             <br>
@@ -163,7 +163,12 @@
                             <input class="form-control" type="number" id="char-ac" name="ac" min="0" value="10">
                             <br>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
+                            <label for="char-proficiency">Proficiency</label>
+                            <input class="form-control" type="number" id="char-proficiency" name="proficiency" min="2" value="2">
+                            <br>
+                        </div>
+                        <div class="col-4">
                             <label for="char-gold">Gold</label>
                             <input class="form-control" type="number" id="char-gold" name="gold" min="0" value="0">
                             <br>
@@ -175,6 +180,19 @@
                             <br>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab">
+            <div class="row">
+                <div class="col-10">
+                    <input type="text" placeholder="Filter items" class="form-control">
+
+                    <ul>
+                        {% for item in items %}
+                          <li> {{ item.name }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
@@ -230,9 +248,17 @@
             let inputElement = document.getElementById('char-' + skillName);
             let modifier = Math.floor((parseInt(inputElement.value) - 10) / 2);
             let skills = document.getElementsByClassName('skill-element');
+            let proficiency = parseInt(document.getElementById('char-proficiency').value);
+
             for (let i = 0; i < skills.length; i++) {
                 if (skillName === skills[i].getAttribute('data-skill')) {
-                    skills[i].innerHTML = (modifier > 0 ? '+' + modifier : modifier);
+                    let proficiencyElementId = skills[i].getAttribute('data-slug');
+                    let proficiencyCheckbox = document.getElementById(proficiencyElementId);
+                    let bonusProficiency = 0;
+                    if (proficiencyCheckbox.checked){
+                        bonusProficiency = proficiency;
+                    }
+                    skills[i].innerHTML = (modifier + proficiency > 0 ? '+' + (modifier + bonusProficiency) : (modifier + bonusProficiency));
                 }
             }
         }
