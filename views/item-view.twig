@@ -1,0 +1,28 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-6">
+            <h1>{{ title }}</h1>
+        </div>
+        <div class="col-5">
+            <button class="btn btn-primary">Vote</button>
+        </div>
+    </div>
+    <p>
+        <b>Votes:</b><br>
+        {{ item.votes }}
+    </p>
+    <p>
+        <b>Type:</b><br>
+        {{ item.type|capitalize }}
+    </p>
+    <p>
+        <b>Description:</b><br>
+        {{ item.description }}
+    </p>
+
+    <hr>
+    <h3>#COMMENTS#</h3>
+{% endblock %}
+

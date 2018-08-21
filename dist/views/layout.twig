@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ title }}</title>
+    {% if title is defined %}
+        <title>{{ title }} | DnD</title>
+    {% else %}
+        <title>DnD diplomski</title>
+    {% endif %}
     <link rel='stylesheet' href='https://bootswatch.com/4/sandstone/bootstrap.min.css'/>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -44,6 +48,9 @@
     </nav>
 </div>
 <div class="container content">
+    {% if error is defined %}
+        <p>{{ error }}</p>
+    {% endif %}
     {% block body %}{% endblock %}
 </div>
 </body>

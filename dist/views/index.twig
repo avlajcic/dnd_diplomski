@@ -1,6 +1,28 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-  <h1>{{title}}</h1>
-  <p>Welcome {% if user is defined%} {{user.username}} {% endif %}to {{title}}</p>
+    <h1>{{ title }}</h1>
+    <p>Welcome {% if user is defined %} {{ user.username }} {% endif %}to {{ title }}</p>
+
+    <hr>
+    <div class="row">
+        <div class="col">
+            <h4>Latest items</h4>
+            {% for item in latestItems %}
+                <li>
+                    <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    {% if item.type == 'weapon' %}
+                        <img class="item-icon" src="/images/weapons_icon.png">
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </div>
+        <div class="col">
+
+        </div>
+        <div class="col">
+
+        </div>
+    </div>
+
 {% endblock %}

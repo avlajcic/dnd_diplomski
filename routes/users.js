@@ -146,23 +146,23 @@ router.get('/logout', function (req, res, next) {
 });
 
 router.get('/myprofile', isAuthenticated, function (req, res, next) {
-    res.render('users/myprofile', {user: req.session.user});
+    res.render('users/myprofile', {user: req.session.user, title: 'Profile'});
 });
 
 router.get('/mycharacters', isAuthenticated, function (req, res, next) {
     Character.find({user: req.session.user}).then(function (characters) {
-        res.render('users/mycharacters', {user: req.session.user, characters: characters});
+        res.render('users/mycharacters', {user: req.session.user, characters: characters, title: 'Characters'});
     }).catch(function (err) {
-        res.render('users/mycharacters', {user: req.session.user, error: 'Problem with retrieving characters.'});
+        res.render('users/mycharacters', {user: req.session.user, error: 'Problem with retrieving characters.', title: 'Characters'});
     });
 });
 
 router.get('/myitems', isAuthenticated, function (req, res, next) {
 
     Item.find({user: req.session.user}).then(function (items) {
-        res.render('users/myitems', {user: req.session.user, items: items});
+        res.render('users/myitems', {user: req.session.user, items: items, title: 'Items'});
     }).catch(function (err) {
-        res.render('users/myitems', {user: req.session.user, error: 'Problem with retrieving items.'});
+        res.render('users/myitems', {user: req.session.user, error: 'Problem with retrieving items.', title: 'Items'});
     })
 
 });
@@ -175,7 +175,7 @@ router.get('/newcharacter', isAuthenticated, function (req, res, next) {
         Item.find().sort({name: 1})
     ]).then(function (doc) {
         doc[2].sort(compareNames);
-        res.render('users/newcharacter', {races: doc[0], classes: doc[1], skills: doc[2], items: doc[3], user: req.session.user});
+        res.render('users/newcharacter', {races: doc[0], classes: doc[1], skills: doc[2], items: doc[3], user: req.session.user, title: 'Character creation'});
     }).catch(function (err) {
 
     });
@@ -183,7 +183,7 @@ router.get('/newcharacter', isAuthenticated, function (req, res, next) {
 });
 
 router.get('/newitem', isAuthenticated, function (req, res, next) {
-    res.render('users/newitem', {user: req.session.user});
+    res.render('users/newitem', {user: req.session.user, title: 'Item creation'});
 
 });
 
@@ -193,32 +193,65 @@ router.post('/character', isAuthenticated, function (req, res) {
    Promise.all([
        Class.findOne({name: req.body.class}),
        Race.findOne({name: req.body.race}),
-       Skill.find({name: req.body.skills})
+       Skill.find({name: req.body.skills}),
+       Item.find({_id: req.body.items})
    ]).then(function (doc) {
+       if (req.body.characterId){
+           Character.findOne({ _id: req.body.characterId}).exec().then(function (character) {
+               character.name = req.body.name;
+               character.class = doc[0];
+               character.race = doc[1];
+               character.skills = doc[2];
+               character.items = doc[3];
+               character.strength = req.body.strength;
+               character.dexterity = req.body.dexterity;
+               character.constitution = req.body.constitution;
+               character.intelligence = req.body.intelligence;
+               character.wisdom = req.body.wisdom;
+               character.charisma = req.body.charisma;
+               character.level = req.body.level;
+               character.healthPoints = req.body.hp;
+               character.armorClass = req.body.ac;
+               character.proficiency = req.body.proficiency;
+               character.gold = req.body.gold;
+               character.silver = req.body.silver;
+               character.copper = req.body.copper;
+               character.user = req.session.user;
 
-       let character = new Character({
-           name: req.body.name,
-           class: doc[0],
-           race: doc[1],
-           skills: doc[2],
-           strength: req.body.strength,
-           dexterity: req.body.dexterity,
-           constitution: req.body.constitution,
-           intelligence: req.body.intelligence,
-           wisdom: req.body.wisdom,
-           charisma: req.body.charisma,
-           level: req.body.level,
-           healthPoints: req.body.hp,
-           armorClass: req.body.ac,
-           proficiency: req.body.proficiency,
-           gold: req.body.gold,
-           silver: req.body.silver,
-           copper: req.body.copper,
-           user: req.session.user
-       });
-       character.save().then(function () {
-           res.redirect('/users/mycharacters');
-       })
+
+               console.log(character);
+               character.save().then(function () {
+                   res.redirect('/users/mycharacters');
+               })
+           });
+
+       }
+      else {
+           var character = new Character();
+
+           character.name = req.body.name;
+           character.class = doc[0];
+           character.race = doc[1];
+           character.skills = doc[2];
+           character.strength = req.body.strength;
+           character.dexterity = req.body.dexterity;
+           character.constitution = req.body.constitution;
+           character.intelligence = req.body.intelligence;
+           character.wisdom = req.body.wisdom;
+           character.charisma = req.body.charisma;
+           character.level = req.body.level;
+           character.healthPoints = req.body.hp;
+           character.armorClass = req.body.ac;
+           character.proficiency = req.body.proficiency;
+           character.gold = req.body.gold;
+           character.silver = req.body.silver;
+           character.copper = req.body.copper;
+           character.user = req.session.user;
+
+           character.save().then(function () {
+               res.redirect('/users/mycharacters');
+           })
+       }
    });
 
 
@@ -240,6 +273,41 @@ router.post('/item', isAuthenticated, function (req, res) {
     }else{
 
     }
+});
+
+
+router.get('/characters/:characterId/edit', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Race.find(),
+        Class.find(),
+        Skill.find({savingThrow: false}),
+        Item.find().sort({name: 1}),
+        Character.findOne({_id: req.params.characterId}).populate('race', 'name').populate('class', 'name').populate('skills', 'name').exec()
+    ]).then(function (doc) {
+        // sort skills by name
+        doc[2].sort(compareNames);
+
+        let hasSkills =[];
+
+        // get all skills from character
+        doc[4].skills.forEach(function (skill) {
+            hasSkills.push(skill.name);
+        });
+
+        res.render('users/newcharacter', {
+            races: doc[0],
+            classes: doc[1],
+            skills: doc[2],
+            items: doc[3],
+            user: req.session.user,
+            character: doc[4],
+            hasSkills: hasSkills,
+            title: doc[4].name + ' edit'
+        });
+    }).catch(function (err) {
+
+    });
+
 });
 
 

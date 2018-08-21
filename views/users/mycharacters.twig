@@ -14,7 +14,7 @@
     {% if characters is defined %}
       <ul>
           {% for character in characters %}
-            <li>{{ character.name|e }}</li>
+            <li><a href="/users/characters/{{ character._id }}/edit">{{ character.name|e }}</a></li>
           {% endfor %}
       </ul>
     {% endif %}

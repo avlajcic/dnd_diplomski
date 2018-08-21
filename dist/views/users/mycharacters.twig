@@ -12,8 +12,11 @@
     </div>
   </div>
     {% if characters is defined %}
-      {#chars#}
-
+      <ul>
+          {% for character in characters %}
+            <li><a href="/users/characters/{{ character._id }}/edit">{{ character.name|e }}</a></li>
+          {% endfor %}
+      </ul>
     {% endif %}
 
 {% endblock %}

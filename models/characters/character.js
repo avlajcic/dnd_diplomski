@@ -8,6 +8,7 @@ let schema = new Schema({
     class: { type: Schema.Types.ObjectId, ref: 'Class' },
     race: { type: Schema.Types.ObjectId, ref: 'Race' },
     skills: [{ type: Schema.Types.ObjectId, ref: 'Skill' }],
+    items: [{ type: Schema.Types.ObjectId, ref: 'Item' }],
     strength: {type: Number, required: true},
     dexterity: {type: Number, required: true},
     constitution: {type: Number, required: true},

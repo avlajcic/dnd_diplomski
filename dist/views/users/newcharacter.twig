@@ -7,15 +7,22 @@
             <div class="row">
                 <div class="col-10">
                     <label for="char-name">Name</label>
-                    <input class="form-control" type="text" id="char-name" name="name" placeholder="Enter your name...">
+                    <input class="form-control" type="text" id="char-name" name="name" placeholder="Enter your name..."
+                        {% if character is defined %}
+                            value="{{ character.name }}"
+                        {% endif %}
+                    >
                     <br>
+
+                    {% set raceIndex = 0 %}
 
                     <label for="char-race">Race</label>
                     <select class="form-control" id="char-race" name="race" onchange="changeRace()">
                         {% for race in races %}
                             <option
-                                    {% if loop.index0 == 0 %}
+                                    {% if character is defined and race.name != character.race.name %}
                                         selected
+                                        {% set raceIndex = loop.index0 %}
                                     {% endif %}
                                     value="{{ race.name }}" data-index="{{ loop.index0 }}">
                                 {{ race.name }}
@@ -24,27 +31,36 @@
                     </select>
                     <br>
                     <div id="race-info">
-                        <p><b>Speed:</b> {{ races[0].speed }}</p>
-                        <p><b>Size:</b> {{ races[0].size }}</p>
-                        <p><b>Ability increase:</b> {{ races[0].abilityIncrease }}</p>
-                        <p><b>Languages:</b> {{ races[0].languages }}</p>
-                        <p><b>Bonuses:</b> <br>{{ races[0].bonuses|nl2br }}</p>
+                        <p><b>Speed:</b> {{ races[raceIndex].speed }}</p>
+                        <p><b>Size:</b> {{ races[raceIndex].size }}</p>
+                        <p><b>Ability increase:</b> {{ races[raceIndex].abilityIncrease }}</p>
+                        <p><b>Languages:</b> {{ races[raceIndex].languages }}</p>
+                        <p><b>Bonuses:</b> <br>{{ races[raceIndex].bonuses|nl2br }}</p>
                     </div>
+
+                    {% set classIndex = 0 %}
 
                     <label for="char-class">Class</label>
                     <select class="form-control" id="char-class" name="class" onchange="changeClass()">
                         {% for class in classes %}
-                            <option value="{{ class.name }}">{{ class.name }}</option>
+                            <option
+                                    {% if character is defined and class.name == character.class.name %}
+                                        selected
+                                        {% set classIndex = loop.index0 %}
+                                    {% endif %}
+                                    value="{{ class.name }}">
+                                {{ class.name }}
+                            </option>
                         {% endfor %}
                     </select>
                     <br>
                     <div id="class-info">
-                        <p><b>Hit dice:</b> {{ classes[0].hitDice }}</p>
-                        <p><b>Armor:</b> {{ classes[0].armor }}</p>
-                        <p><b>Weapons:</b> {{ classes[0].weapons }}</p>
-                        <p><b>Tools:</b> {{ classes[0].tools }}</p>
-                        <p><b>Saving throws:</b> {{ classes[0].savingThrows }}</p>
-                        <p><b>Skills:</b> {{ classes[0].skills }}</p>
+                        <p><b>Hit dice:</b> {{ classes[classIndex].hitDice }}</p>
+                        <p><b>Armor:</b> {{ classes[classIndex].armor }}</p>
+                        <p><b>Weapons:</b> {{ classes[classIndex].weapons }}</p>
+                        <p><b>Tools:</b> {{ classes[classIndex].tools }}</p>
+                        <p><b>Saving throws:</b> {{ classes[classIndex].savingThrows }}</p>
+                        <p><b>Skills:</b> {{ classes[classIndex].skills }}</p>
                     </div>
                 </div>
             </div>
@@ -54,7 +70,7 @@
                 <div class="row">
                     <div class="col">
                         <div id="race-ability-info">
-                            <p><b>Race ability increase: </b> {{ races[0].abilityIncrease }} </p>
+                            <p><b>Race ability increase: </b> {{ races[raceIndex].abilityIncrease }} </p>
                         </div>
                     </div>
                 </div>
@@ -64,32 +80,62 @@
                             <div class="col-4 col-lg-2">
                                 <label for="char-str">Strength</label>
                                 <input class="form-control" type="number" id="char-str" name="strength" min="0" max="30"
-                                       value="10" onchange="changeSkill('str')">
+                                        {% if character is defined  %}
+                                            value="{{ character.strength }}"
+                                        {% else %}
+                                            value="10"
+                                        {% endif %}
+                                        onchange="changeSkill('str')">
                             </div>
                             <div class="col-4 col-lg-2">
                                 <label for="char-dex">Dexterity</label>
                                 <input class="form-control" type="number" id="char-dex" name="dexterity" min="0" max="30"
-                                       value="10" onchange="changeSkill('dex')">
+                                        {% if character is defined  %}
+                                            value="{{ character.dexterity }}"
+                                        {% else %}
+                                            value="10"
+                                        {% endif %}
+                                        onchange="changeSkill('dex')">
                             </div>
                             <div class="col-4 col-lg-2">
                                 <label for="char-con">Constitution</label>
                                 <input class="form-control" type="number" id="char-con" name="constitution" min="0" max="30"
-                                       value="10" onchange="changeSkill('con')">
+                                        {% if character is defined  %}
+                                            value="{{ character.constitution }}"
+                                        {% else %}
+                                            value="10"
+                                        {% endif %}
+                                        onchange="changeSkill('con')">
                             </div>
                             <div class="col-4 col-lg-2">
                                 <label for="char-int">Intelligence</label>
                                 <input class="form-control" type="number" id="char-int" name="intelligence" min="0" max="30"
-                                       value="10" onchange="changeSkill('int')">
+                                        {% if character is defined  %}
+                                            value="{{ character.intelligence }}"
+                                        {% else %}
+                                            value="10"
+                                        {% endif %}
+                                       onchange="changeSkill('int')">
                             </div>
                             <div class="col-4 col-lg-2">
                                 <label for="char-wis">Wisdom</label>
                                 <input class="form-control" type="number" id="char-wis" name="wisdom" min="0" max="30"
-                                       value="10" onchange="changeSkill('wis')">
+                                        {% if character is defined  %}
+                                            value="{{ character.wisdom }}"
+                                        {% else %}
+                                            value="10"
+                                        {% endif %}
+                                       onchange="changeSkill('wis')">
                             </div>
                             <div class="col-4 col-lg-2">
                                 <label for="char-cha">Charisma</label>
                                 <input class="form-control" type="number" id="char-cha" name="charisma" min="0" max="30"
-                                       value="10" onchange="changeSkill('cha')">
+                                        {% if character is defined  %}
+                                            value="{{ character.charisma }}"
+                                        {% else %}
+                                            value="10"
+                                        {% endif %}
+                                        onchange="changeSkill('cha')">
                             </div>
                         </div>
                     </div>
@@ -97,32 +143,32 @@
                 <br>
                 <div class="row">
                     <div class="col-6 col-md-3 skills-div">
-                        <input type="checkbox" name="strength_proficiency" id="strength_proficiency">
+                        <input class="proficiency-checkbox" type="checkbox" name="strength_proficiency" id="strength_proficiency" onchange="changeSkillProficiency('strength_proficiency')">
                         <label>Strength: </label>
                         <span id="strength-saving-throw" data-skill="str" data-slug="strength_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="dexterity_proficiency" id="dexterity_proficiency">
+                        <input class="proficiency-checkbox" type="checkbox" name="dexterity_proficiency" id="dexterity_proficiency" onchange="changeSkillProficiency('dexterity_proficiency')">
                         <label>Dexterity: </label>
                         <span id="dexterity-saving-throw" data-skill="dex" data-slug="dexterity_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="constitution_proficiency" id="constitution_proficiency">
+                        <input class="proficiency-checkbox" type="checkbox" name="constitution_proficiency" id="constitution_proficiency" onchange="changeSkillProficiency('constitution_proficiency')">
                         <label>Constitution: </label>
                         <span id="constitution-saving-throw" data-skill="con" data-slug="constitution_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="intelligence_proficiency" id="intelligence_proficiency">
+                        <input class="proficiency-checkbox" type="checkbox" name="intelligence_proficiency" id="intelligence_proficiency" onchange="changeSkillProficiency('intelligence_proficiency')">
                         <label>Intelligence: </label>
                         <span id="intelligence-saving-throw" data-skill="int" data-slug="intelligence_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="wisdom_proficiency" id="wisdom_proficiency">
+                        <input class="proficiency-checkbox" type="checkbox" name="wisdom_proficiency" id="wisdom_proficiency" onchange="changeSkillProficiency('wisdom_proficiency')">
                         <label>Wisdom: </label>
                         <span id="wisdom-saving-throw" data-skill="wis" data-slug="wisdom_proficiency" class="skill-element">0</span>
                         <br>
 
-                        <input type="checkbox" name="charisma_proficiency" id="charisma_proficiency">
+                        <input class="proficiency-checkbox" type="checkbox" name="charisma_proficiency" id="charisma_proficiency" onchange="changeSkillProficiency('charisma_proficiency')">
                         <label>Charisma: </label>
                         <span id="charisma-saving-throw" data-skill="cha" data-slug="charisma_proficiency" class="skill-element">0</span>
                         <br>
@@ -131,7 +177,15 @@
                         {% if loop.index0 % 6 == 0 %}
                             <div class="col-6 col-md-3 skills-div">
                         {% endif %}
-                            <input type="checkbox" name="{{ skill.slug }}" id="{{ skill.slug }}_proficiency">
+                            <input
+                                    class="proficiency-checkbox"
+                                    type="checkbox" name="skills"
+                                    id="{{ skill.slug }}_proficiency" value="{{ skill.name }}"
+                                    onchange="changeSkillProficiency('{{ skill.slug }}_proficiency')"
+                                    {% if skill.name in hasSkills %}
+                                        checked="checked"
+                                    {% endif %}
+                            >
                             <label>{{ skill.name }}: </label>
                             <span data-skill="{{ skill.bonus }}"  data-slug="{{ skill.slug }}_proficiency" class="skill-element">0</span>
                             <br>
@@ -147,36 +201,77 @@
                     <div class="row">
                         <div class="col">
                             <div id="class-hitDice-info">
-                                <p><b>Class hit dice: </b> {{ classes[0].hitDice }} </p>
+                                <p><b>Class hit dice: </b> {{ classes[classIndex].hitDice }} </p>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-4">
                             <label for="char-level">Level</label>
-                            <input class="form-control" type="number" id="char-level" name="level" min="1" value="1">
+                            <input class="form-control" type="number" id="char-level" name="level" min="1"
+                                {% if character is defined  %}
+                                   value="{{ character.level }}"
+                                {% else %}
+                                   value="1"
+                                {% endif %}
+                            >
                             <br>
                             <label for="char-hp">Health points</label>
-                            <input class="form-control" type="number" id="char-hp" name="hp" min="0" value="{{ classes[0].hitDice [2:] }}">
+                            <input class="form-control" type="number" id="char-hp" name="hp" min="0"
+                                    {% if character is defined %}
+                                        value="{{ character.healthPoints }}"
+                                    {% else %}
+                                        value="{{ classes[0].hitDice [2:] }}"
+                                    {% endif %}>
                             <br>
                             <label for="char-ac">Armor class</label>
-                            <input class="form-control" type="number" id="char-ac" name="ac" min="0" value="10">
+                            <input class="form-control" type="number" id="char-ac" name="ac" min="0"
+                                    {% if character is defined %}
+                                        value="{{ character.armorClass }}"
+                                    {% else %}
+                                        value="10"
+                                    {% endif %}
+                            >
                             <br>
                         </div>
                         <div class="col-4">
                             <label for="char-proficiency">Proficiency</label>
-                            <input class="form-control" type="number" id="char-proficiency" name="proficiency" min="2" value="2">
+                            <input class="form-control" type="number" id="char-proficiency" name="proficiency" min="2"
+                                    {% if character is defined %}
+                                        value="{{ character.proficiency }}"
+                                    {% else %}
+                                        value="2"
+                                    {% endif %}
+                            >
                             <br>
                         </div>
                         <div class="col-4">
                             <label for="char-gold">Gold</label>
-                            <input class="form-control" type="number" id="char-gold" name="gold" min="0" value="0">
+                            <input class="form-control" type="number" id="char-gold" name="gold" min="0"
+                                    {% if character is defined %}
+                                        value="{{ character.gold }}"
+                                    {% else %}
+                                        value="0"
+                                    {% endif %}
+                            >
                             <br>
                             <label for="char-silver">Silver</label>
-                            <input class="form-control" type="number" id="char-silver" name="silver" min="0" value="0">
+                            <input class="form-control" type="number" id="char-silver" name="silver" min="0"
+                                    {% if character is defined %}
+                                        value="{{ character.silver }}"
+                                    {% else %}
+                                        value="0"
+                                    {% endif %}
+                            >
                             <br>
                             <label for="char-copper">Copper</label>
-                            <input class="form-control" type="number" id="char-copper" name="copper" min="0" value="0">
+                            <input class="form-control" type="number" id="char-copper" name="copper" min="0"
+                                    {% if character is defined %}
+                                        value="{{ character.copper }}"
+                                    {% else %}
+                                        value="0"
+                                    {% endif %}
+                            >
                             <br>
                         </div>
                     </div>
@@ -186,16 +281,22 @@
         <div class="tab">
             <div class="row">
                 <div class="col-10">
-                    <input type="text" placeholder="Filter items" class="form-control">
+                    <input type="text" id="filter" placeholder="Filter items" class="form-control">
 
                     <ul>
                         {% for item in items %}
-                          <li> {{ item.name }}</li>
+                            <div>
+                                <label>{{ item.name }}</label><br>
+                                <input type="checkbox" name="items" class="item-checkbox" value="{{ item._id }}">
+                            </div>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
         </div>
+        {% if character is defined %}
+            <input type="hidden" name="characterId" value="{{ character._id }}" >
+        {% endif %}
     </form>
     <div style="overflow:auto;" class="offset-sm-8">
         <div>
@@ -263,9 +364,43 @@
             }
         }
 
+        function changeSkillProficiency(dataSlug) {
+            let proficiencyElement = document.querySelectorAll("[data-slug='" + dataSlug + "']")[0];
+            let proficiencyCheckbox = document.getElementById(dataSlug);
+            let skillName = proficiencyElement.getAttribute('data-skill');
+            let inputElement = document.getElementById('char-' + skillName);
+            let modifier = Math.floor((parseInt(inputElement.value) - 10) / 2);
+            let proficiency = parseInt(document.getElementById('char-proficiency').value);
+            let bonusProficiency = 0;
+            if (proficiencyCheckbox.checked){
+                bonusProficiency = proficiency;
+            }
+            proficiencyElement.innerHTML = (modifier + proficiency > 0 ? '+' + (modifier + bonusProficiency) : (modifier + bonusProficiency));
+
+        }
+
+        $('#char-proficiency').on('load', function () {
+            updateProficiency();
+        })
+
         let currentTab = 0;
         showTab(currentTab);
+        updateProficiency();
 
+        function updateProficiency() {
+            var profValue =  $('#char-proficiency').val();
+            $('.proficiency-checkbox').each(function (index) {
+                if ($(this).is(":checked")){
+                    var checkId = ($(this).attr('id'));
+                    var span = $("span[data-slug='" + checkId + "']");
+                    var skill = span.data('skill');
+                    var skillValue = $('#char-'+skill).val();
+
+                    var newSpanValue = parseInt(profValue) +  Math.floor((parseInt(skillValue) - 10) / 2);
+                    span.text(newSpanValue > 0 ? '+' + newSpanValue : newSpanValue);
+                }
+            })
+        }
         function showTab(n) {
             let tabs = document.getElementsByClassName("tab");
             tabs[n].style.display = "block";
@@ -300,7 +435,7 @@
             y = tabs[currentTab].getElementsByTagName("input");
 
             for (i = 0; i < y.length; i++) {
-                if (y[i].value === "") {
+                if (y[i].value === "" && y[i].id !== 'filter') {
                     y[i].className += " invalid";
                     valid = false;
                 }
