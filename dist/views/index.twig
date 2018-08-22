@@ -9,19 +9,62 @@
         <div class="col">
             <h4>Latest items</h4>
             {% for item in latestItems %}
-                <li>
-                    <a href="/items/{{ item._id }}"> {{ item.name }} </a>
-                    {% if item.type == 'weapon' %}
-                        <img class="item-icon" src="/images/weapons_icon.png">
-                    {% endif %}
-                </li>
+                <div class="row">
+                    <div class="col">
+                        {% if item.type == 'weapon' %}
+                            <img class="item-icon" src="/images/weapons_icon.png">
+                        {% elseif item.type == 'armor'%}
+                            <img class="item-icon" src="/images/armor_icon.png">
+                        {% else %}
+                            <img class="item-icon" src="/images/misc_icon.png">
+                        {% endif %}
+                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    </div>
+                    <div class="col">
+                        {{ item.votes }}
+                    </div>
+                </div>
             {% endfor %}
         </div>
         <div class="col">
-
+            <h4>Hottest items today</h4>
+            {% for item in hottestToday %}
+                <div class="row">
+                    <div class="col">
+                        {% if item.type == 'weapon' %}
+                            <img class="item-icon" src="/images/weapons_icon.png">
+                        {% elseif item.type == 'armor'%}
+                            <img class="item-icon" src="/images/armor_icon.png">
+                        {% else %}
+                            <img class="item-icon" src="/images/misc_icon.png">
+                        {% endif %}
+                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    </div>
+                    <div class="col">
+                        {{ item.votes }}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
         <div class="col">
-
+            <h4>Most voted items</h4>
+            {% for item in mostVoted %}
+                <div class="row">
+                    <div class="col">
+                        {% if item.type == 'weapon' %}
+                            <img class="item-icon" src="/images/weapons_icon.png">
+                        {% elseif item.type == 'armor'%}
+                            <img class="item-icon" src="/images/armor_icon.png">
+                        {% else %}
+                            <img class="item-icon" src="/images/misc_icon.png">
+                        {% endif %}
+                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    </div>
+                    <div class="col">
+                        {{ item.votes }}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 

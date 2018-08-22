@@ -3,10 +3,12 @@
 {% block body %}
     <div class="row">
         <div class="col-6">
-            <h1>{{ title }}</h1>
+            <h1>{{ item.name }} - {{ item.user.username }}</h1>
         </div>
         <div class="col-5">
-            <button class="btn btn-primary">Vote</button>
+            {% if user is defined %}
+                <button class="btn btn-primary" onclick="voteItem()" id="vote-btn">Vote</button>
+            {% endif %}
         </div>
     </div>
     <p>
@@ -24,5 +26,24 @@
 
     <hr>
     <h3>#COMMENTS#</h3>
+
+
+    <script>
+        function voteItem() {
+            $('#vote-btn').prop('disabled', true);
+            $.ajax({
+                type: 'post',
+                url: '/users/items/{{ item._id }}/vote',
+                // beforeSend: function(xhr){xhr.setRequestHeader('Authorization', userToken);},
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert('There was a problem with your vote, please try again.');
+                }
+            });
+        }
+    </script>
 {% endblock %}
 

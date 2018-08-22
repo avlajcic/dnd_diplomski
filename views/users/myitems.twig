@@ -14,7 +14,7 @@
     {% if items is defined %}
       <ul>
           {% for item in items %}
-            <li>{{ item.name|e }}</li>
+            <li><a href="/users/items/{{ item._id }}/edit">{{ item.name|e }}</a></li>
           {% endfor %}
       </ul>
     {% endif %}

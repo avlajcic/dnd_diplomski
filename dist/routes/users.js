@@ -197,7 +197,6 @@ router.post('/character', isAuthenticated, function (req, res) {
                 character.copper = req.body.copper;
                 character.user = req.session.user;
 
-                console.log(character);
                 character.save().then(function () {
                     res.redirect('/users/mycharacters');
                 });
@@ -233,16 +232,33 @@ router.post('/character', isAuthenticated, function (req, res) {
 
 router.post('/item', isAuthenticated, function (req, res) {
     if (!validator.isEmpty(req.body.name) && !validator.isEmpty(req.body.type) && !validator.isEmpty(req.body.description)) {
-        var item = new Item({
-            name: req.body.name,
-            type: req.body.type,
-            description: req.body.description,
-            user: req.session.user
-        });
-        item.save().then(function () {
-            res.redirect('/users/myitems');
-        });
-    } else {}
+        if (req.body.itemId) {
+            Item.findOne({ _id: req.body.itemId }).exec().then(function (item) {
+                item.name = req.body.name;
+                item.type = req.body.type;
+                item.description = req.body.description;
+                item.user = req.session.user;
+
+                item.save().then(function () {
+                    res.redirect('/users/myitems');
+                });
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            var item = new Item({
+                name: req.body.name,
+                type: req.body.type,
+                description: req.body.description,
+                user: req.session.user
+            });
+            item.save().then(function () {
+                res.redirect('/users/myitems');
+            });
+        }
+    } else {
+        res.redirect('/users/newitem');
+    }
 });
 
 router.get('/characters/:characterId/edit', isAuthenticated, function (req, res, next) {
@@ -268,6 +284,32 @@ router.get('/characters/:characterId/edit', isAuthenticated, function (req, res,
             title: doc[4].name + ' edit'
         });
     }).catch(function (err) {});
+});
+
+router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
+    Promise.all([Item.findOne({ _id: req.params.itemId })]).then(function (doc) {
+        res.render('users/newitem', {
+            item: doc[0],
+            title: doc[0].name + ' edit',
+            user: req.session.user
+        });
+    }).catch(function (err) {});
+});
+
+router.post('/items/:itemId/vote', isAuthenticated, function (req, res, next) {
+
+    Item.findOne({ _id: req.params.itemId }).then(function (item) {
+        item.votes = item.votes + 1;
+        item.save().then(function () {
+            res.json({ success: true, item: item });
+        }).catch(function (err) {
+            res.status(500);
+            res.json({ success: false, errors: 'Problem with saving vote.' });
+        });
+    }).catch(function (err) {
+        res.status(404);
+        res.json({ success: false, errors: err.message });
+    });
 });
 
 module.exports = router;

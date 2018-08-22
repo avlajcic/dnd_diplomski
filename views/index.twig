@@ -7,21 +7,88 @@
     <hr>
     <div class="row">
         <div class="col">
-            <h4>Latest items</h4>
+            <h4 class="text-center">Latest items</h4>
             {% for item in latestItems %}
-                <li>
-                    <a href="/items/{{ item._id }}"> {{ item.name }} </a>
-                    {% if item.type == 'weapon' %}
-                        <img class="item-icon" src="/images/weapons_icon.png">
-                    {% endif %}
-                </li>
+                <div class="row">
+                    <div class="col-1">
+                        {% if item.type == 'weapon' %}
+                            <img class="item-icon" src="/images/weapons_icon.png">
+                        {% elseif item.type == 'armor'%}
+                            <img class="item-icon" src="/images/armor_icon.png">
+                        {% else %}
+                            <img class="item-icon" src="/images/misc_icon.png">
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    </div>
+                    <div class="col-2">
+                        {{ item.votes }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col text-center">
+                        /
+                    </div>
+                </div>
             {% endfor %}
         </div>
         <div class="col">
-
+            <h4 class="text-center">Hottest items today</h4>
+            {% for item in hottestToday %}
+                <div class="row">
+                    <div class="col-1">
+                        {% if item.type == 'weapon' %}
+                            <img class="item-icon" src="/images/weapons_icon.png">
+                        {% elseif item.type == 'armor'%}
+                            <img class="item-icon" src="/images/armor_icon.png">
+                        {% else %}
+                            <img class="item-icon" src="/images/misc_icon.png">
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    </div>
+                    <div class="col-2">
+                        {{ item.votes }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col text-center">
+                        /
+                    </div>
+                </div>
+            {% endfor %}
         </div>
         <div class="col">
-
+            <h4 class="text-center">Most voted items</h4>
+            {% for item in mostVoted %}
+                <div class="row">
+                    <div class="col-1">
+                        {% if item.type == 'weapon' %}
+                            <img class="item-icon" src="/images/weapons_icon.png">
+                        {% elseif item.type == 'armor'%}
+                            <img class="item-icon" src="/images/armor_icon.png">
+                        {% else %}
+                            <img class="item-icon" src="/images/misc_icon.png">
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
+                    </div>
+                    <div class="col-2">
+                        {{ item.votes }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col text-center">
+                        /
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 

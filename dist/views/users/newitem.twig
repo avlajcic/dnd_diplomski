@@ -6,20 +6,33 @@
             <div class="row">
                 <div class="col-10">
                     <label for="char-name">Name</label>
-                    <input class="form-control" type="text" id="item-name" name="name" placeholder="Enter item name..." required>
+                    <input class="form-control" type="text" id="item-name" name="name" placeholder="Enter item name..."
+                            {% if item is defined %}
+                                value="{{ item.name }}"
+                            {% endif %}
+                            required>
                     <br>
                     <div class="form-group">
                         <label for="type">Item type:</label>
                         <select class="form-control" id="type" name="type" required>
-                            <option value="weapon">Weapon</option>
-                            <option value="armor">Armor</option>
-                            <option value="misc">Misc</option>
+                            {% for type in ['weapon', 'armor', 'misc'] %}
+                                <option
+                                        {% if item is defined and item.type == type %}
+                                        selected
+                                        {% endif %}
+                                        value="{{ type }}">{{ type|capitalize }}</option>
+
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="description">Description:</label>
-                        <textarea class="form-control" rows="5" name="description" required></textarea>
+                        <textarea class="form-control" rows="5" name="description" required>{% if item is defined %}{{ item.description }}{% endif %}
+                        </textarea>
                     </div>
+                    {% if item is defined %}
+                        <input type="hidden" name="itemId" value="{{ item._id }}" >
+                    {% endif %}
                     <div style="overflow:auto;" class="offset-sm-8">
                         <input type="submit" class="btn btn-success" value="Submit">
                     </div>
