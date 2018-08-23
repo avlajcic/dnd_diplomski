@@ -38,3 +38,8 @@ input.invalid {
   width: 16px;
   height: 16px;
 }
+
+#errors{
+  color: #dc0000;
+  font-size: 16px;
+}

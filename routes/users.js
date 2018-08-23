@@ -17,6 +17,7 @@ let Class = require('../models/characters/class');
 let Skill = require('../models/characters/skill');
 let Item = require('../models/item');
 let Vote = require('../models/votes');
+let Comment = require('../models/comments');
 let Character = require('../models/characters/character');
 
 let app = express();
@@ -344,6 +345,8 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
 
 });
 
+/** API **/
+
 router.post('/items/:itemId/vote', isAuthenticated, function (req, res, next) {
 
     Promise.all([
@@ -369,10 +372,31 @@ router.post('/items/:itemId/vote', isAuthenticated, function (req, res, next) {
                     res.json({success: false, errors: 'Problem with saving vote.'});
                 });
             }else{
-                return Promise.reject(new Error('You have already voted for this item'));
+                return Promise.reject(new Error('You have already voted for this item.'));
             }
 
         }).catch(function (err) {
+        res.status(400);
+        res.json({success: false, errors: err.message});
+    });
+
+});
+
+router.post('/items/:itemId/comment', isAuthenticated, function (req, res, next) {
+
+    Item.findOne({_id: req.params.itemId}).then(function (item) {
+       let comment = new Comment({
+           item: item._id,
+           user: req.session.user._id,
+           comment: req.body.comment
+       });
+
+       comment.save(function () {
+           res.json({success: true, comment: comment});
+       }).catch(function () {
+           return Promise.reject(new Error('Problem with saving comment.'));
+       })
+    }).catch(function (err) {
         res.status(400);
         res.json({success: false, errors: err.message});
     });

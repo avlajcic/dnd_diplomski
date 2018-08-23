@@ -2,6 +2,7 @@ let express = require('express');
 let router = express.Router();
 
 let Item = require('../models/item');
+let Comment = require('../models/comments');
 
 
 /* GET home page. */
@@ -32,11 +33,13 @@ router.get('/', function(req, res, next) {
 router.get('/items/:itemId', function (req, res) {
     Promise.all([
         Item.find().findOne({_id: req.params.itemId}).populate('user', 'username').exec(),
+        Comment.find().find({item: req.params.itemId}).populate('user', 'username').exec(),
     ]).then(function (doc) {
         console.log(doc);
         res.render('item-view', {
             item: doc[0],
             title: doc[0].name,
+            comments: doc[1],
             user: req.session.user
         });
     }).catch(function (err) {

@@ -11,6 +11,11 @@
             {% endif %}
         </div>
     </div>
+    <div class="row">
+        <div id="errors" class="col">
+
+        </div>
+    </div>
     <p>
         <b>Votes:</b><br>
         {{ item.votes }}
@@ -25,7 +30,41 @@
     </p>
 
     <hr>
-    <h3>#COMMENTS#</h3>
+
+    <div id="comments-container">
+        <h4>Comments</h4>
+        <div class="row">
+            <div class="col" id="comments">
+                {% for comment in comments %}
+                    <p><b>{{ comment.user.username }}</b></p>
+                    <p>{{ comment.comment }}</p>
+                    <hr>
+                {% else %}
+                    There are no comments for this item yet. Be first!
+                {% endfor %}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {% if user is defined %}
+                    <div class="text-center" id="form-success">
+
+                    </div>
+                    <div class="text-center" id="form-error">
+
+                    </div>
+
+                    <form id="comment-form" action="/users/items/{{ item._id }}/comment" method="post">
+                        <label for="comment-textarea">Comment:</label>
+                        <textarea id="comment-textarea" name="comment" class="form-control"></textarea>
+                        <br>
+                        <input type ="submit" class="btn btn-success" value="Submit">
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
 
     <script>
@@ -40,10 +79,43 @@
                 },
                 error: function (data) {
                     console.log(data);
-                    alert('There was a problem with your vote, please try again.');
+                    $('#errors').html(data.responseJSON.errors);
                 }
             });
         }
+
+        var commentForm = $('#comment-form');
+        var successDiv = $('#form-success');
+        var errorDiv = $('#form-error');
+
+
+        commentForm.on('submit', function (e) {
+
+            e.preventDefault();
+            successDiv.hide();
+
+            $('.error').each(function() {
+                $(this).remove();
+            });
+
+            $.ajax({
+                type: commentForm.attr('method'),
+                url: commentForm.attr('action'),
+                data: commentForm.serialize(),
+                success: function (data) {
+                        commentForm.hide();
+                        successDiv.html('<h3>Your comment has been added</h3>');
+                        successDiv.show();
+                        $('#comments').append('<p><b>{{ user.username }}</b></p>\n' +
+                            '                  <p>' +$('#comment-textarea').val() +'</p>'+
+                                                '<hr>')
+                    },
+                error: function (data) {
+                    successDiv.html('<h3>' + data.messages + '</h3>');
+                    successDiv.show();
+                }
+                });
+        });
     </script>
 {% endblock %}
 

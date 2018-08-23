@@ -18,6 +18,8 @@ var Race = require('../models/characters/race');
 var Class = require('../models/characters/class');
 var Skill = require('../models/characters/skill');
 var Item = require('../models/item');
+var Vote = require('../models/votes');
+var Comment = require('../models/comments');
 var Character = require('../models/characters/character');
 
 var app = express();
@@ -296,18 +298,51 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
     }).catch(function (err) {});
 });
 
+/** API **/
+
 router.post('/items/:itemId/vote', isAuthenticated, function (req, res, next) {
 
+    Promise.all([Item.findOne({ _id: req.params.itemId }), Vote.findOne({ user: req.session.user._id, item: req.params.itemId })]).then(function (doc) {
+        if (!doc[1]) {
+            var item = doc[0];
+            item.votes = item.votes + 1;
+
+            var vote = new Vote({
+                user: req.session.user._id,
+                item: req.params.itemId
+            });
+
+            Promise.all([item.save(), vote.save()]).then(function () {
+                res.json({ success: true, item: item });
+            }).catch(function (err) {
+                res.status(500);
+                res.json({ success: false, errors: 'Problem with saving vote.' });
+            });
+        } else {
+            return Promise.reject(new Error('You have already voted for this item.'));
+        }
+    }).catch(function (err) {
+        res.status(400);
+        res.json({ success: false, errors: err.message });
+    });
+});
+
+router.post('/items/:itemId/comment', isAuthenticated, function (req, res, next) {
+
     Item.findOne({ _id: req.params.itemId }).then(function (item) {
-        item.votes = item.votes + 1;
-        item.save().then(function () {
-            res.json({ success: true, item: item });
-        }).catch(function (err) {
-            res.status(500);
-            res.json({ success: false, errors: 'Problem with saving vote.' });
+        var comment = new Comment({
+            item: item._id,
+            user: req.session.user._id,
+            comment: req.body.comment
+        });
+
+        comment.save(function () {
+            res.json({ success: true, comment: comment });
+        }).catch(function () {
+            return Promise.reject(new Error('Problem with saving comment.'));
         });
     }).catch(function (err) {
-        res.status(404);
+        res.status(400);
         res.json({ success: false, errors: err.message });
     });
 });
