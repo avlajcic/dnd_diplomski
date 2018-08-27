@@ -5,7 +5,7 @@
     <form id="newItemForm" method="post" action="/users/item">
             <div class="row">
                 <div class="col-10">
-                    <label for="char-name">Name</label>
+                    <label for="item-name">Name</label>
                     <input class="form-control" type="text" id="item-name" name="name" placeholder="Enter item name..."
                             {% if item is defined %}
                                 value="{{ item.name }}"

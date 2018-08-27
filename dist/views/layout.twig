@@ -8,6 +8,7 @@
     {% endif %}
     <link rel='stylesheet' href='https://bootswatch.com/4/sandstone/bootstrap.min.css'/>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel='stylesheet' href='/javascripts/chosen/chosen.min.css'/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -31,6 +32,12 @@
                 {% if user is defined %}
                     <li class="nav-item">
                         <a class="nav-link" href="/users/myprofile">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users/mygroups">Groups</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users/myfriends">Friends</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/users/logout">Logout</a>

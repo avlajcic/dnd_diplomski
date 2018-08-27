@@ -18,6 +18,8 @@ let Skill = require('../models/characters/skill');
 let Item = require('../models/item');
 let Vote = require('../models/votes');
 let Comment = require('../models/comments');
+let Group = require('../models/group');
+let Invite = require('../models/invite');
 let Character = require('../models/characters/character');
 
 let app = express();
@@ -345,6 +347,156 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
 
 });
 
+router.get('/mygroups', isAuthenticated, function (req, res, next) {
+
+    Promise.all([
+        Group.find({users: req.session.user}),
+        Group.find({owner: req.session.user})
+    ]).then(function (doc) {
+        res.render('users/mygroups', {user: req.session.user, allGroups: doc[0], ownerGroups: doc[1], title: 'Groups'});
+    }).catch(function (err) {
+        res.render('users/mygroups', {user: req.session.user, error: 'Problem with retrieving groups.', title: 'Groups'});
+    })
+
+});
+
+router.get('/newgroup', isAuthenticated, function (req, res, next) {
+    User.findOne({_id: req.session.user._id}).populate('friends').exec().then(function (user) {
+        res.render('users/newgroup', {user: req.session.user, title: 'Group creation', friends: user.friends});
+    })
+
+});
+
+router.post('/group', isAuthenticated, function (req, res) {
+    if (!validator.isEmpty(req.body.name)) {
+        if (req.body.groupId){
+            Group.findOne({ _id: req.body.groupId}).exec().then(function (group) {
+                group.name = req.body.name;
+                group.users = req.body.friends;
+                group.users.push(req.session.user);
+                group.owner = req.session.user;
+                group.dm = req.session.user;
+
+
+                group.save().then(function () {
+                    res.redirect('/users/mygroups');
+                })
+            }).catch(function (err) {
+                console.log(err);
+            });
+
+        }
+        else {
+            let group = new Group({
+                name : req.body.name,
+                users : req.body.friends,
+                owner : req.session.user,
+                dm : req.session.user
+            });
+            group.users.push(req.session.user);
+
+            group.save().then(function () {
+                res.redirect('/users/mygroups');
+            })
+        }
+
+    }else{
+        res.redirect('/users/newgroup');
+    }
+});
+
+router.get('/groups/:groupId/edit', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Group.findOne({_id: req.params.groupId}).populate('users').exec(),
+        User.findOne({_id: req.session.user._id}).populate('friends').exec()
+    ]).then(function (doc) {
+        res.render('users/newgroup', {
+            group: doc[0],
+            title: doc[0].name + ' edit',
+            user: req.session.user,
+            friends: doc[1].friends
+        });
+    }).catch(function (err) {
+
+    });
+
+});
+
+router.get('/groups/:groupId/leave', isAuthenticated, function (req, res, next) {
+    Group.findOne({_id: req.params.groupId}).populate('users').exec().then(function (group) {
+        var otherUser;
+        for (var i= 0; i < group.users.length; i++){
+            if (group.users[i]._id !== req.session.user._id){
+                otherUser = group.users[i];
+            }
+        }
+
+        if (otherUser){
+            if (group.dm == req.session.user._id){
+                group.dm = otherUser;
+            }
+            if (group.owner == req.session.user._id){
+                group.owner = otherUser;
+            }
+
+            group.users.pull(req.session.user);
+            group.save().then(function () {
+                res.redirect('/users/mygroups');
+            });
+        }else{
+            group.remove().then(function () {
+                res.redirect('/users/mygroups');
+            });
+        }
+    }).catch(function (err) {
+
+    });
+
+});
+
+router.get('/groups/:groupId/delete', isAuthenticated, function (req, res, next) {
+    Group.findOne({_id: req.params.groupId}).then(function (group) {
+        group.remove().then(function () {
+            res.redirect('/users/mygroups');
+        });
+    }).catch(function (err) {
+
+    });
+
+});
+
+router.get('/myfriends', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Invite.find({to: req.session.user}).populate('from', 'username').exec(),
+        User.findOne({_id: req.session.user._id}).populate('friends', 'username').exec()
+    ]).then(function (doc) {
+        res.render('users/myfriends', {user: req.session.user, title: 'Friends', invites: doc[0], friends: doc[1].friends});
+    }).catch(function (err) {
+        res.render('users/myfriends', {user: req.session.user, title: 'Friends', error: 'Problem with retrieving invites.'});
+    })
+});
+
+router.get('/friends/:friendId/remove', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        User.findOne({_id: req.session.user._id}),
+        User.findOne({_id: req.params.friendId}),
+    ]).then(function (doc) {
+           doc[0].friends.pull(doc[1]);
+           doc[1].friends.pull(doc[0]);
+
+           Promise.all([
+               doc[0].save(),
+               doc[1].save()
+           ]).then(function () {
+               res.redirect('/users/myfriends');
+           })
+    }).catch(function (err) {
+
+    });
+
+});
+
+
 /** API **/
 
 router.post('/items/:itemId/vote', isAuthenticated, function (req, res, next) {
@@ -401,6 +553,68 @@ router.post('/items/:itemId/comment', isAuthenticated, function (req, res, next)
         res.json({success: false, errors: err.message});
     });
 
+});
+
+router.post('/addfriend', isAuthenticated, function (req, res, next) {
+
+    User.findOne({username: req.body.friend}).then(function (user) {
+        if (!user){
+            return Promise.reject(new Error('There is no user with that username.'));
+        }
+        let invite = new Invite({
+            from: req.session.user._id,
+            to: user._id,
+        });
+
+        invite.save(function () {
+            res.json({success: true, invite: invite});
+        }).catch(function () {
+            return Promise.reject(new Error('Problem with sending invite.'));
+        })
+    }).catch(function (err) {
+        res.status(400);
+        res.json({success: false, errors: err.message});
+    });
+
+});
+
+router.post('/invite/:inviteId/accept', isAuthenticated, function (req, res, next) {
+    Invite.findOne({_id: req.params.inviteId}).populate('from').populate('to').exec().then(function (invite) {
+        console.log(invite);
+        let userOne = invite.from;
+        let userTwo = invite.to;
+        userOne.friends.push(userTwo);
+        userTwo.friends.push(userOne);
+
+        Promise.all([
+            userOne.save(),
+            userTwo.save(),
+            invite.remove()
+        ]).then(function () {
+            res.json({success: true});
+        }).catch(function (err) {
+            res.status(500);
+            res.json({success: false, errors: 'Problem with adding friends.'});
+        });
+    }).catch(function (err) {
+        res.status(400);
+        res.json({success: false, errors: err.message});
+    })
+});
+
+router.post('/invite/:inviteId/remove', isAuthenticated, function (req, res, next) {
+    Invite.findOne({_id: req.params.inviteId}).then(function (invite) {
+
+        invite.remove().then(function () {
+            res.json({success: true});
+        }).catch(function (err) {
+            res.status(500);
+            res.json({success: false, errors: 'Problem with adding friends.'});
+        });
+    }).catch(function (err) {
+        res.status(400);
+        res.json({success: false, errors: err.message});
+    })
 });
 
 module.exports = router;

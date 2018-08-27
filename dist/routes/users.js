@@ -20,6 +20,8 @@ var Skill = require('../models/characters/skill');
 var Item = require('../models/item');
 var Vote = require('../models/votes');
 var Comment = require('../models/comments');
+var Group = require('../models/group');
+var Invite = require('../models/invite');
 var Character = require('../models/characters/character');
 
 var app = express();
@@ -298,6 +300,61 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
     }).catch(function (err) {});
 });
 
+router.get('/mygroups', isAuthenticated, function (req, res, next) {
+
+    Group.find({ users: req.session.user }).then(function (groups) {
+        res.render('users/mygroups', { user: req.session.user, groups: groups, title: 'Groups' });
+    }).catch(function (err) {
+        res.render('users/mygroups', { user: req.session.user, error: 'Problem with retrieving groups.', title: 'Groups' });
+    });
+});
+
+router.get('/newgroup', isAuthenticated, function (req, res, next) {
+    User.findOne({ _id: req.session.user._id }).populate('friends').exec().then(function (user) {
+        console.log(user.friends);
+        res.render('users/newgroup', { user: req.session.user, title: 'Group creation', friends: user.friends });
+    });
+});
+
+router.post('/group', isAuthenticated, function (req, res) {
+    if (!validator.isEmpty(req.body.name)) {
+        if (req.body.groupId) {
+            Group.findOne({ _id: req.body.groupId }).exec().then(function (group) {
+                group.name = req.body.name;
+                group.users = req.body.friends;
+                group.owner = req.session.user;
+                group.dm = req.session.user;
+
+                group.save().then(function () {
+                    res.redirect('/users/mygroups');
+                });
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            var group = new Group({
+                name: req.body.name,
+                users: req.body.friends,
+                owner: req.session.user,
+                dm: req.session.user
+            });
+            group.save().then(function () {
+                res.redirect('/users/mygroups');
+            });
+        }
+    } else {
+        res.redirect('/users/newgroup');
+    }
+});
+
+router.get('/myfriends', isAuthenticated, function (req, res, next) {
+    Promise.all([Invite.find({ to: req.session.user }).populate('from', 'username').exec(), User.findOne({ _id: req.session.user._id }).populate('friends', 'username').exec()]).then(function (doc) {
+        res.render('users/myfriends', { user: req.session.user, title: 'Friends', invites: doc[0], friends: doc[1].friends });
+    }).catch(function (err) {
+        res.render('users/myfriends', { user: req.session.user, title: 'Friends', error: 'Problem with retrieving invites.' });
+    });
+});
+
 /** API **/
 
 router.post('/items/:itemId/vote', isAuthenticated, function (req, res, next) {
@@ -340,6 +397,63 @@ router.post('/items/:itemId/comment', isAuthenticated, function (req, res, next)
             res.json({ success: true, comment: comment });
         }).catch(function () {
             return Promise.reject(new Error('Problem with saving comment.'));
+        });
+    }).catch(function (err) {
+        res.status(400);
+        res.json({ success: false, errors: err.message });
+    });
+});
+
+router.post('/addfriend', isAuthenticated, function (req, res, next) {
+
+    User.findOne({ username: req.body.friend }).then(function (user) {
+        if (!user) {
+            return Promise.reject(new Error('There is no user with that username.'));
+        }
+        var invite = new Invite({
+            from: req.session.user._id,
+            to: user._id
+        });
+
+        invite.save(function () {
+            res.json({ success: true, invite: invite });
+        }).catch(function () {
+            return Promise.reject(new Error('Problem with sending invite.'));
+        });
+    }).catch(function (err) {
+        res.status(400);
+        res.json({ success: false, errors: err.message });
+    });
+});
+
+router.post('/invite/:inviteId/accept', isAuthenticated, function (req, res, next) {
+    Invite.findOne({ _id: req.params.inviteId }).populate('from').populate('to').exec().then(function (invite) {
+        console.log(invite);
+        var userOne = invite.from;
+        var userTwo = invite.to;
+        userOne.friends.push(userTwo);
+        userTwo.friends.push(userOne);
+
+        Promise.all([userOne.save(), userTwo.save(), invite.remove()]).then(function () {
+            res.json({ success: true });
+        }).catch(function (err) {
+            res.status(500);
+            res.json({ success: false, errors: 'Problem with adding friends.' });
+        });
+    }).catch(function (err) {
+        res.status(400);
+        res.json({ success: false, errors: err.message });
+    });
+});
+
+router.post('/invite/:inviteId/remove', isAuthenticated, function (req, res, next) {
+    Invite.findOne({ _id: req.params.inviteId }).then(function (invite) {
+
+        invite.remove().then(function () {
+            res.json({ success: true });
+        }).catch(function (err) {
+            res.status(500);
+            res.json({ success: false, errors: 'Problem with adding friends.' });
         });
     }).catch(function (err) {
         res.status(400);

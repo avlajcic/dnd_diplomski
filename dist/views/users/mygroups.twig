@@ -1,0 +1,22 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+  <h1>{{user.username}}'s groups</h1>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <a href="/users/newgroup" class="profile-tab">
+        <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
+        <h3>New group</h3>
+      </a>
+    </div>
+  </div>
+    {% if groups is defined %}
+      <ul>
+          {% for group in groups %}
+            <li><a href="/users/group/{{ group._id }}/edit">{{ group.name|e }}</a></li>
+          {% endfor %}
+      </ul>
+    {% endif %}
+
+{% endblock %}

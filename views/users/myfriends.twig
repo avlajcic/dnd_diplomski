@@ -1,0 +1,123 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <h1>{{ user.username }}'s friends</h1>
+
+    <div class="row">
+        <div class="col">
+            <div class="text-center" id="form-success">
+
+            </div>
+            <div class="text-center" id="form-error">
+
+            </div>
+            <form action="/users/addfriend" method="post" id="new-friend-form">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <input type="text" name="friend" class="form-control" placeholder="Friends username...">
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="submit" class="btn btn-success" value="Send invite">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% if invites is defined and invites.length > 0 %}
+    <div class="row">
+        <div class="col-sm-12">
+            <h3>You have new friend invites!</h3>
+            {% for invite in invites %}
+                <div class="row" id="invite_{{ invite._id }}">
+                    <div class="col-sm-8">
+                        {{ invite.from.username }}
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-success" onclick="acceptInv('{{ invite._id }}')">Accept</button>
+                        <button class="btn btn-danger" onclick="removeInv('{{ invite._id }}')">Remove</button>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-sm-12">
+            <ul>
+                {% for friend in friends %}
+                    <div class="row list-items">
+                        <div class="col-sm-8">
+                            {{ friend.username|e }}
+                        </div>
+                        <div class="col-sm-4">
+                            <a class="btn btn-danger" href="/users/friends/{{ friend._id }}/remove">Remove</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+
+    <script>
+        var friendForm = $('#new-friend-form');
+        var successDiv = $('#form-success');
+        var errorDiv = $('#form-error');
+
+
+        friendForm.on('submit', function (e) {
+
+            e.preventDefault();
+            successDiv.hide();
+            errorDiv.hide();
+
+            $('.error').each(function() {
+                $(this).remove();
+            });
+
+            $.ajax({
+                type: friendForm.attr('method'),
+                url: friendForm.attr('action'),
+                data: friendForm.serialize(),
+                success: function (data) {
+                    successDiv.html('<h3>Your invite has been sent</h3>');
+                    successDiv.show();
+                },
+                error: function (data) {
+                    errorDiv.html('<h3>' + data.responseJSON.errors + '</h3>');
+                    errorDiv.show();
+                }
+            });
+        });
+
+        function acceptInv(id) {
+            $.ajax({
+                type: 'post',
+                url: '/users/invite/' + id + '/accept',
+                success: function () {
+                    $('#invite_' + id).html('<h3>Your have accepted friendship!</h3>');
+                },
+                error: function (data) {
+                    console.log(data);
+                    $('#invite_' + id).html('<h3>There was a problem accepting your friendship. Please refresh and try again.</h3>');
+                }
+            });
+        }
+
+        function removeInv(id) {
+            $.ajax({
+                type: 'post',
+                url: '/users/invite/' + id + '/remove',
+                success: function () {
+                    $('#invite_' + id).html('<h3>Your have removed invitation!</h3>');
+                },
+                error: function () {
+                    $('#invite_' + id).html('<h3>There was a problem removing invitation. Please refresh and try again.</h3>');
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <h1>{{ user.username }}'s groups</h1>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <a href="/users/newgroup" class="profile-tab">
+                <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
+                <h3>New group</h3>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <h3>Owner</h3>
+            {% if ownerGroups is defined %}
+                {% for group in ownerGroups %}
+                    <div class="row list-items">
+                        <div class="col-sm-8">
+                            <a href="/users/groups/{{ group._id }}">{{ group.name|e }}</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a class="btn btn-primary" href="/users/groups/{{ group._id }}/edit">Edit</a>
+                            <a class="btn btn-danger" href="/users/groups/{{ group._id }}/delete">Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="col-sm-6">
+            <h3>Member</h3>
+            {% if allGroups is defined %}
+                {% for group in allGroups %}
+                    <div class="row list-items">
+                        <div class="col-sm-8">
+                            <a href="/users/groups/{{ group._id }}">{{ group.name|e }}</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a class="btn btn-danger" href="/users/groups/{{ group._id }}/leave">Leave</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

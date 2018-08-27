@@ -1,0 +1,53 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <h1>New group</h1>
+    <form id="newGroupForm" method="post" action="/users/group">
+            <div class="row">
+                <div class="col-10">
+                    <label for="group-name">Name</label>
+                    <input class="form-control" type="text" id="group-name" name="name" placeholder="Enter group name..."
+                            {% if group is defined %}
+                                value="{{ group.name }}"
+                            {% endif %}
+                            required>
+                    <br>
+
+                    <div class="form-group">
+                        <label for="friends-select">Friends</label>
+                        <select class="form-control" id="friends-select" name="friends" multiple>
+                            {% for friend in friends %}
+                                <option value="{{ friend._id }}"
+                                        {% for groupUser in group.users %}
+                                            {% if groupUser._id == friend._id %}
+                                                selected
+                                            {% endif %}
+                                        {% endfor %}
+                                >
+                                    {{ friend.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if group is defined %}
+                        <input type="hidden" name="groupId" value="{{ group._id }}" >
+                    {% endif %}
+                    <div style="overflow:auto;" class="offset-sm-8">
+                        <input type="submit" class="btn btn-success" value="Submit">
+                    </div>
+                </div>
+            </div>
+
+    </form>
+
+    <script src='/javascripts/chosen/chosen.jquery.min.js'></script>
+
+    <script>
+
+        $("#friends-select").chosen({
+            search_contains: true,
+            single_backstroke_delete: false,
+            width: '100%'
+        });
+    </script>
+{% endblock %}
