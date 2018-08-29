@@ -12,12 +12,18 @@
                             {% endif %}
                             required>
                     <br>
+
                     <div class="form-group">
                         <label for="friends-select">Friends</label>
                         <select class="form-control" id="friends-select" name="friends" multiple>
                             {% for friend in friends %}
-                                <option
-                                        value="{{ friend._id }}">
+                                <option value="{{ friend._id }}"
+                                        {% for groupUser in group.users %}
+                                            {% if groupUser._id == friend._id %}
+                                                selected
+                                            {% endif %}
+                                        {% endfor %}
+                                >
                                     {{ friend.username }}
                                 </option>
                             {% endfor %}

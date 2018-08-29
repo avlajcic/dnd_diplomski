@@ -1,0 +1,70 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <h1>{{ group.name }}</h1>
+
+    <div class="row">
+        <div class="col">
+            <form action="/users/groups/{{ group._id }}/change-character" method="post">
+                <label for="character-select">Pick character for this group:</label>
+                <select id="character-select" class="form-control" name="character">
+                    {% for character in characters %}
+                        <option value="{{ character._id }}">
+                            {{ character.name }}
+                        </option>
+                    {% endfor %}
+                        <input type="submit" class="btn btn-success" value="Submit">
+                </select>
+            </form>
+        </div>
+    </div>
+    <div class="row" style="margin-top:50px">
+        <div class="col-sm-4">
+            #CHAT#
+        </div>
+        <div class="col-sm-8">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>Group members</h3>
+                    {% for member in group.users %}
+                        {% if loop.index0 % 3 == 0 %}<div class="row">{% endif %}
+
+                        <div class="col member-info">{{ member.username }}</div>
+
+                        {% if loop.index0 % 3 == 2 or loop.last %}</div>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-sm-12">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a data-toggle="pill" class="nav-link active" href="#trade">Trade</a>
+                        </li>
+                        <li class="nav-item">
+                            <a data-toggle="pill" class="nav-link" href="#files">Files</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tab-content">
+                <div id="trade" class="row tab-pane fade show active">
+                    <div class="col-sm-12">
+                        {{ character.name }}
+                        {% for item in character.items %}
+                            {{ item.name }}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div id="files" class="row tab-pane fade">
+                    <div class="col-sm-12">
+                        Some files text
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -47,7 +47,14 @@
         <div class="col-sm-12">
             <ul>
                 {% for friend in friends %}
-                    <li>{{ friend.username }}</li>
+                    <div class="row list-items">
+                        <div class="col-sm-8">
+                            {{ friend.username|e }}
+                        </div>
+                        <div class="col-sm-4">
+                            <a class="btn btn-danger" href="/users/friends/{{ friend._id }}/remove">Remove</a>
+                        </div>
+                    </div>
                 {% endfor %}
             </ul>
         </div>

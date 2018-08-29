@@ -465,6 +465,61 @@ router.get('/groups/:groupId/delete', isAuthenticated, function (req, res, next)
 
 });
 
+router.get('/groups/:groupId', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Group.findOne({_id: req.params.groupId}).populate('users').populate('dm')
+            .populate({
+                    path: 'characters',
+                    populate: { path: 'items'}
+            }).exec(),
+        Character.find({user: req.session.user})
+    ]).then(function (doc) {
+        let character;
+        let group = doc[0];
+
+        for (var i = 0; i < group.characters.length; i++){
+            if (group.characters[i] && group.characters[i].user == req.session.user._id){
+                character = group.characters[i];
+                break;
+            }
+        }
+
+        res.render('users/group', {
+            group: doc[0],
+            title: doc[0].name,
+            characters: doc[1],
+            character: character,
+            user: req.session.user
+        });
+    }).catch(function (err) {
+
+    });
+
+});
+
+router.post('/groups/:groupId/change-character', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Group.findOne({_id: req.params.groupId}).populate('characters').exec(),
+        Character.findOne({_id: req.body.character}),
+    ]).then(function (doc) {
+        let group = doc[0];
+
+        for (var i = 0; i < group.characters.length; i++){
+            if (group.characters[i] && group.characters[i].user._id === req.session.user._id){
+                group.characters.pull(group.characters[i]);
+            }
+        }
+
+        group.characters.push(doc[1]);
+        group.save().then(function () {
+            res.redirect('/users/groups/' + req.params.groupId);
+        });
+    }).catch(function (err) {
+
+    });
+
+});
+
 router.get('/myfriends', isAuthenticated, function (req, res, next) {
     Promise.all([
         Invite.find({to: req.session.user}).populate('from', 'username').exec(),

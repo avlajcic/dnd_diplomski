@@ -302,8 +302,8 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
 
 router.get('/mygroups', isAuthenticated, function (req, res, next) {
 
-    Group.find({ users: req.session.user }).then(function (groups) {
-        res.render('users/mygroups', { user: req.session.user, groups: groups, title: 'Groups' });
+    Promise.all([Group.find({ users: req.session.user }), Group.find({ owner: req.session.user })]).then(function (doc) {
+        res.render('users/mygroups', { user: req.session.user, allGroups: doc[0], ownerGroups: doc[1], title: 'Groups' });
     }).catch(function (err) {
         res.render('users/mygroups', { user: req.session.user, error: 'Problem with retrieving groups.', title: 'Groups' });
     });
@@ -311,7 +311,6 @@ router.get('/mygroups', isAuthenticated, function (req, res, next) {
 
 router.get('/newgroup', isAuthenticated, function (req, res, next) {
     User.findOne({ _id: req.session.user._id }).populate('friends').exec().then(function (user) {
-        console.log(user.friends);
         res.render('users/newgroup', { user: req.session.user, title: 'Group creation', friends: user.friends });
     });
 });
@@ -322,6 +321,7 @@ router.post('/group', isAuthenticated, function (req, res) {
             Group.findOne({ _id: req.body.groupId }).exec().then(function (group) {
                 group.name = req.body.name;
                 group.users = req.body.friends;
+                group.users.push(req.session.user);
                 group.owner = req.session.user;
                 group.dm = req.session.user;
 
@@ -338,6 +338,8 @@ router.post('/group', isAuthenticated, function (req, res) {
                 owner: req.session.user,
                 dm: req.session.user
             });
+            group.users.push(req.session.user);
+
             group.save().then(function () {
                 res.redirect('/users/mygroups');
             });
@@ -347,12 +349,113 @@ router.post('/group', isAuthenticated, function (req, res) {
     }
 });
 
+router.get('/groups/:groupId/edit', isAuthenticated, function (req, res, next) {
+    Promise.all([Group.findOne({ _id: req.params.groupId }).populate('users').exec(), User.findOne({ _id: req.session.user._id }).populate('friends').exec()]).then(function (doc) {
+        res.render('users/newgroup', {
+            group: doc[0],
+            title: doc[0].name + ' edit',
+            user: req.session.user,
+            friends: doc[1].friends
+        });
+    }).catch(function (err) {});
+});
+
+router.get('/groups/:groupId/leave', isAuthenticated, function (req, res, next) {
+    Group.findOne({ _id: req.params.groupId }).populate('users').exec().then(function (group) {
+        var otherUser;
+        for (var i = 0; i < group.users.length; i++) {
+            if (group.users[i]._id !== req.session.user._id) {
+                otherUser = group.users[i];
+            }
+        }
+
+        if (otherUser) {
+            if (group.dm == req.session.user._id) {
+                group.dm = otherUser;
+            }
+            if (group.owner == req.session.user._id) {
+                group.owner = otherUser;
+            }
+
+            group.users.pull(req.session.user);
+            group.save().then(function () {
+                res.redirect('/users/mygroups');
+            });
+        } else {
+            group.remove().then(function () {
+                res.redirect('/users/mygroups');
+            });
+        }
+    }).catch(function (err) {});
+});
+
+router.get('/groups/:groupId/delete', isAuthenticated, function (req, res, next) {
+    Group.findOne({ _id: req.params.groupId }).then(function (group) {
+        group.remove().then(function () {
+            res.redirect('/users/mygroups');
+        });
+    }).catch(function (err) {});
+});
+
+router.get('/groups/:groupId', isAuthenticated, function (req, res, next) {
+    Promise.all([Group.findOne({ _id: req.params.groupId }).populate('users').populate('dm').populate({
+        path: 'characters',
+        populate: { path: 'items' }
+    }).exec(), Character.find({ user: req.session.user })]).then(function (doc) {
+        var character = void 0;
+        var group = doc[0];
+
+        for (var i = 0; i < group.characters.length; i++) {
+            if (group.characters[i] && group.characters[i].user == req.session.user._id) {
+                character = group.characters[i];
+                break;
+            }
+        }
+
+        res.render('users/group', {
+            group: doc[0],
+            title: doc[0].name,
+            characters: doc[1],
+            character: character,
+            user: req.session.user
+        });
+    }).catch(function (err) {});
+});
+
+router.post('/groups/:groupId/change-character', isAuthenticated, function (req, res, next) {
+    Promise.all([Group.findOne({ _id: req.params.groupId }).populate('characters').exec(), Character.findOne({ _id: req.body.character })]).then(function (doc) {
+        var group = doc[0];
+
+        for (var i = 0; i < group.characters.length; i++) {
+            if (group.characters[i] && group.characters[i].user._id === req.session.user._id) {
+                group.characters.pull(group.characters[i]);
+            }
+        }
+
+        group.characters.push(doc[1]);
+        group.save().then(function () {
+            res.redirect('/users/groups/' + req.params.groupId);
+        });
+    }).catch(function (err) {});
+});
+
 router.get('/myfriends', isAuthenticated, function (req, res, next) {
     Promise.all([Invite.find({ to: req.session.user }).populate('from', 'username').exec(), User.findOne({ _id: req.session.user._id }).populate('friends', 'username').exec()]).then(function (doc) {
         res.render('users/myfriends', { user: req.session.user, title: 'Friends', invites: doc[0], friends: doc[1].friends });
     }).catch(function (err) {
         res.render('users/myfriends', { user: req.session.user, title: 'Friends', error: 'Problem with retrieving invites.' });
     });
+});
+
+router.get('/friends/:friendId/remove', isAuthenticated, function (req, res, next) {
+    Promise.all([User.findOne({ _id: req.session.user._id }), User.findOne({ _id: req.params.friendId })]).then(function (doc) {
+        doc[0].friends.pull(doc[1]);
+        doc[1].friends.pull(doc[0]);
+
+        Promise.all([doc[0].save(), doc[1].save()]).then(function () {
+            res.redirect('/users/myfriends');
+        });
+    }).catch(function (err) {});
 });
 
 /** API **/

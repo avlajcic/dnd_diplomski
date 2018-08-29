@@ -45,18 +45,14 @@
     {% endif %}
     <div class="row">
         <div class="col-sm-12">
-            <ul>
                 {% for friend in friends %}
-                    <div class="row list-items">
-                        <div class="col-sm-8">
+                    {% if loop.index0 % 3 == 0 %}<div class="row">{% endif %}
+                        <div class="col member-info">
                             {{ friend.username|e }}
-                        </div>
-                        <div class="col-sm-4">
                             <a class="btn btn-danger" href="/users/friends/{{ friend._id }}/remove">Remove</a>
                         </div>
-                    </div>
+                    {% if loop.index0 % 3 == 2 or loop.last %}</div>{% endif %}
                 {% endfor %}
-            </ul>
         </div>
     </div>
 
