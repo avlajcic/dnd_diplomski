@@ -17,6 +17,7 @@
     "dotenv": "^4.0.0",
     "express": "~4.15.5",
     "express-session": "^1.15.6",
+    "firebase-tools": "^4.2.1",
     "mongodb": "^2.2.33",
     "mongoose": "^4.13.5",
     "morgan": "~1.9.0",
