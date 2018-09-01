@@ -149,12 +149,12 @@ router.get('/logout', function (req, res, next) {
     })
 });
 
-router.get('/myprofile', isAuthenticated, function (req, res, next) {
-    res.render('users/myprofile', {user: req.session.user, title: 'Profile'});
-});
+// router.get('/myprofile', isAuthenticated, function (req, res, next) {
+//     res.render('users/myprofile', {user: req.session.user, title: 'Profile'});
+// });
 
 router.get('/mycharacters', isAuthenticated, function (req, res, next) {
-    Character.find({user: req.session.user}).then(function (characters) {
+    Character.find({user: req.session.user}).populate('class', 'name').populate('race', 'name').exec().then(function (characters) {
         res.render('users/mycharacters', {user: req.session.user, characters: characters, title: 'Characters'});
     }).catch(function (err) {
         res.render('users/mycharacters', {user: req.session.user, error: 'Problem with retrieving characters.', title: 'Characters'});
@@ -332,6 +332,21 @@ router.get('/characters/:characterId/edit', isAuthenticated, function (req, res,
 
 });
 
+router.get('/characters/:characterId/delete', isAuthenticated, function (req, res, next) {
+    Character.findOne({_id: req.params.characterId}).then(function (character) {
+        if (character.user == req.session.user._id) {
+            character.remove().then(function () {
+                res.redirect('/users/mycharacters');
+            });
+        }else{
+            Promise.reject(new Error('You are not owner of this character'));
+        }
+    }).catch(function (err) {
+        console.log(err.message);
+    });
+
+});
+
 router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
     Promise.all([
         Item.findOne({_id: req.params.itemId})
@@ -347,6 +362,20 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
 
 });
 
+router.get('/items/:itemId/delete', isAuthenticated, function (req, res, next) {
+    Item.findOne({_id: req.params.itemId}).then(function (item) {
+        if (item.user == req.session.user._id) {
+            item.remove().then(function () {
+                res.redirect('/users/myitems');
+            });
+        }else{
+            Promise.reject(new Error('You are not owner of this item'));
+        }
+    }).catch(function (err) {
+        console.log(err.message);
+    });
+
+});
 router.get('/mygroups', isAuthenticated, function (req, res, next) {
 
     Promise.all([
@@ -514,6 +543,54 @@ router.post('/groups/:groupId/change-character', isAuthenticated, function (req,
         group.save().then(function () {
             res.redirect('/users/groups/' + req.params.groupId);
         });
+    }).catch(function (err) {
+
+    });
+
+});
+
+router.post('/groups/:groupId/trade', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Group.findOne({_id: req.params.groupId}).populate({
+            path: 'characters',
+            populate: { path: 'user'}
+        }).exec(),
+        User.findOne({_id: req.body.user}),
+        Item.find({_id: req.body.items})
+    ]).then(function (doc) {
+        let group = doc[0];
+        let tradingUser = doc[1];
+        let items = doc[2];
+        let userCharacter;
+        let tradingCharacter;
+
+        for (var i = 0; i < group.characters.length; i++){
+            if (group.characters[i]) {
+                if (group.characters[i].user.username == req.session.user.username) {
+                    userCharacter = group.characters[i];
+                }else if (group.characters[i].user.username == tradingUser.username) {
+                    tradingCharacter = group.characters[i];
+                }
+            }
+        }
+
+        userCharacter.gold -= req.body.gold;
+        userCharacter.silver -= req.body.silver;
+        userCharacter.copper -= req.body.copper;
+        tradingCharacter.gold += req.body.gold;
+        tradingCharacter.silver += req.body.silver;
+        tradingCharacter.copper += req.body.copper;
+
+        for (let i = 0; i < items.length; i++){
+            userCharacter.items.pull(items[i]);
+            tradingCharacter.items.push(items[i]);
+        }
+        Promise.all([
+            userCharacter.save(),
+            tradingCharacter.save()
+        ]).then(function () {
+            res.redirect('/users/groups/' + req.params.groupId);
+        })
     }).catch(function (err) {
 
     });

@@ -281,16 +281,24 @@
         <div class="tab">
             <div class="row">
                 <div class="col-10">
-                    <input type="text" id="filter" placeholder="Filter items" class="form-control">
-
-                    <ul>
+                    <table id="items-table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Trade</th>
+                        </tr>
+                        </thead>
+                        <tbody>
                         {% for item in items %}
-                            <div>
-                                <label>{{ item.name }}</label><br>
-                                <input type="checkbox" name="items" class="item-checkbox" value="{{ item._id }}">
-                            </div>
+                            <tr>
+                                <th>{{ item.name }}</th>
+                                <th>
+                                    <input type="checkbox" name="items" value="{{ item._id }}">
+                                </th>
+                            </tr>
                         {% endfor %}
-                    </ul>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -435,7 +443,7 @@
             y = tabs[currentTab].getElementsByTagName("input");
 
             for (i = 0; i < y.length; i++) {
-                if (y[i].value === "" && y[i].id !== 'filter') {
+                if (y[i].value === "" && y[i].type !== 'search') {
                     y[i].className += " invalid";
                     valid = false;
                 }
@@ -448,6 +456,10 @@
             }
             return valid;
         }
+
+        $(document).ready( function () {
+            $('#items-table').DataTable();
+        } );
     </script>
 
 

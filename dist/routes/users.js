@@ -439,6 +439,44 @@ router.post('/groups/:groupId/change-character', isAuthenticated, function (req,
     }).catch(function (err) {});
 });
 
+router.post('/groups/:groupId/trade', isAuthenticated, function (req, res, next) {
+    Promise.all([Group.findOne({ _id: req.params.groupId }).populate({
+        path: 'characters',
+        populate: { path: 'user' }
+    }).exec(), User.findOne({ _id: req.body.user }), Item.find({ _id: req.body.items })]).then(function (doc) {
+        var group = doc[0];
+        var tradingUser = doc[1];
+        var items = doc[2];
+        var userCharacter = void 0;
+        var tradingCharacter = void 0;
+
+        for (var i = 0; i < group.characters.length; i++) {
+            if (group.characters[i]) {
+                if (group.characters[i].user.username == req.session.user.username) {
+                    userCharacter = group.characters[i];
+                } else if (group.characters[i].user.username == tradingUser.username) {
+                    tradingCharacter = group.characters[i];
+                }
+            }
+        }
+
+        userCharacter.gold -= req.body.gold;
+        userCharacter.silver -= req.body.silver;
+        userCharacter.copper -= req.body.copper;
+        tradingCharacter.gold += req.body.gold;
+        tradingCharacter.silver += req.body.silver;
+        tradingCharacter.copper += req.body.copper;
+
+        for (var _i = 0; _i < items.length; _i++) {
+            userCharacter.items.pull(items[_i]);
+            tradingCharacter.items.push(items[_i]);
+        }
+        Promise.all([userCharacter.save(), tradingCharacter.save()]).then(function () {
+            res.redirect('/users/groups/' + req.params.groupId);
+        });
+    }).catch(function (err) {});
+});
+
 router.get('/myfriends', isAuthenticated, function (req, res, next) {
     Promise.all([Invite.find({ to: req.session.user }).populate('from', 'username').exec(), User.findOne({ _id: req.session.user._id }).populate('friends', 'username').exec()]).then(function (doc) {
         res.render('users/myfriends', { user: req.session.user, title: 'Friends', invites: doc[0], friends: doc[1].friends });

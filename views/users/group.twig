@@ -60,12 +60,54 @@
 
             <div class="tab-content">
                 <div id="trade" class="row tab-pane fade show active">
-                    <div class="col-sm-12">
-                        {{ character.name }}
-                        {% for item in character.items %}
-                            {{ item.name }}
-                        {% endfor %}
-                    </div>
+                    <form action="/users/groups/{{ group._id }}/trade" method="post">
+                        <div class="row">
+                            <div class="col">
+                                <label for="user-select">Select user to trade with:</label>
+                                <select id="user-select" name="user" class="form-control">
+                                    {% for member in group.users %}
+                                        {% if member.username != user.username %}
+                                            <option value="{{ member._id }}">{{ member.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="char-gold">Gold ({{ character.gold }})</label>
+                                <input class="form-control" type="number" id="char-gold" name="gold" min="0" max="{{ character.gold }}" value="0">
+                                <br>
+                                <label for="char-silver">Silver ({{ character.silver}})</label>
+                                <input class="form-control" type="number" id="char-silver" name="silver" min="0" max="{{ character.silver }}" value="0">
+                                <br>
+                                <label for="char-copper">Copper ({{ character.copper }})</label>
+                                <input class="form-control" type="number" id="char-copper" name="copper" min="0" max="{{ character.copper }}" value="0">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="items-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Trade</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in character.items %}
+                                        <tr>
+                                            <th>{{ item.name }}</th>
+                                            <th>
+                                                <input type="checkbox" name="items" value="{{ item._id }}">
+                                            </th>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                                <input type="submit" class="btn btn-success" value="Trade">
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 <div id="files" class="row tab-pane fade">
@@ -137,6 +179,11 @@
 
 
         loadMessages();
+
+        $(document).ready( function () {
+            $('#items-table').DataTable();
+        } );
+
 
     </script>
 {% endblock %}

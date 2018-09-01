@@ -13,14 +13,23 @@
                             {{ character.name }}
                         </option>
                     {% endfor %}
-                        <input type="submit" class="btn btn-success" value="Submit">
+                    <input type="submit" class="btn btn-success" value="Submit">
                 </select>
             </form>
         </div>
     </div>
     <div class="row" style="margin-top:50px">
         <div class="col-sm-4">
-            #CHAT#
+            <div class="chat-area" data-show="true" style="display: inline-block;">
+                <section id="chat-box">
+                    <div id="messages"></div>
+                </section>
+                <form id="message-form" method="post">
+
+                    <input id="message" class="form-control" type="text" placeholder="Message..." autofocus=""
+                           style="display: block;">
+                </form>
+            </div>
         </div>
         <div class="col-sm-8">
             <div class="row">
@@ -51,12 +60,54 @@
 
             <div class="tab-content">
                 <div id="trade" class="row tab-pane fade show active">
-                    <div class="col-sm-12">
-                        {{ character.name }}
-                        {% for item in character.items %}
-                            {{ item.name }}
-                        {% endfor %}
-                    </div>
+                    <form action="/users/groups/{{ group._id }}/trade" method="post">
+                        <div class="row">
+                            <div class="col">
+                                <label for="user-select">Select user to trade with:</label>
+                                <select id="user-select" name="user" class="form-control">
+                                    {% for member in group.users %}
+                                        {% if member.username != user.username %}
+                                            <option value="{{ member._id }}">{{ member.username }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="char-gold">Gold ({{ character.gold }})</label>
+                                <input class="form-control" type="number" id="char-gold" name="gold" min="0" max="{{ character.gold }}" value="0">
+                                <br>
+                                <label for="char-silver">Silver ({{ character.silver}})</label>
+                                <input class="form-control" type="number" id="char-silver" name="silver" min="0" max="{{ character.silver }}" value="0">
+                                <br>
+                                <label for="char-copper">Copper ({{ character.copper }})</label>
+                                <input class="form-control" type="number" id="char-copper" name="copper" min="0" max="{{ character.copper }}" value="0">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="items-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Trade</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in character.items %}
+                                        <tr>
+                                            <th>{{ item.name }}</th>
+                                            <th>
+                                                <input type="checkbox" name="items" value="{{ item._id }}">
+                                            </th>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                                <input type="submit" class="btn btn-success" value="Trade">
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 <div id="files" class="row tab-pane fade">
@@ -67,4 +118,72 @@
             </div>
         </div>
     </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBFqzPrOC3i7j_YhyCdbUpiw0amWkdl3_w",
+            authDomain: "dnd-chat.firebaseapp.com",
+            databaseURL: "https://dnd-chat.firebaseio.com",
+            projectId: "dnd-chat",
+            storageBucket: "dnd-chat.appspot.com",
+            messagingSenderId: "408671389026"
+        };
+        firebase.initializeApp(config);
+        var messageFormElement = document.getElementById('message-form');
+        var messageInputElement = document.getElementById('message');
+        var messagesElement = $('#messages');
+
+
+        function loadMessages() {
+            // Loads the last 12 messages and listen for new ones.
+            var callback = function (snap) {
+                var data = snap.val();
+                displayMessage(data.name, data.text);
+                messagesElement.scrollTop(messagesElement[0].scrollHeight);
+            };
+
+            firebase.database().ref('/messages/{{ group._id }}/').limitToLast(100).on('child_added', callback);
+            firebase.database().ref('/messages/{{ group._id }}').limitToLast(100).on('child_changed', callback);
+        }
+
+        function displayMessage(name, text) {
+            messagesElement.append('<p><b>' + name + ': </b>' + text + '</p><hr>');
+        }
+
+        function saveMessage(messageText) {
+            return firebase.database().ref('/messages/{{ group._id }}/').push({
+                name: '{{ user.username }}',
+                text: messageText
+            }).catch(function (error) {
+                console.error('Error writing new message to Firebase Database', error);
+            });
+        }
+
+        function onMessageFormSubmit(e) {
+            if (e) {
+                e.preventDefault();
+            }
+            if (messageInputElement.value) {
+                saveMessage(messageInputElement.value).then(function () {
+                    $('#message').val('')
+                });
+            }
+        }
+
+        messageFormElement.addEventListener('submit', onMessageFormSubmit);
+
+
+        loadMessages();
+
+        $(document).ready( function () {
+            $('#items-table').DataTable();
+        } );
+
+
+    </script>
 {% endblock %}
