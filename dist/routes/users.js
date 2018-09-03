@@ -143,12 +143,12 @@ router.get('/logout', function (req, res, next) {
     });
 });
 
-router.get('/myprofile', isAuthenticated, function (req, res, next) {
-    res.render('users/myprofile', { user: req.session.user, title: 'Profile' });
-});
+// router.get('/myprofile', isAuthenticated, function (req, res, next) {
+//     res.render('users/myprofile', {user: req.session.user, title: 'Profile'});
+// });
 
 router.get('/mycharacters', isAuthenticated, function (req, res, next) {
-    Character.find({ user: req.session.user }).then(function (characters) {
+    Character.find({ user: req.session.user }).populate('class', 'name').populate('race', 'name').exec().then(function (characters) {
         res.render('users/mycharacters', { user: req.session.user, characters: characters, title: 'Characters' });
     }).catch(function (err) {
         res.render('users/mycharacters', { user: req.session.user, error: 'Problem with retrieving characters.', title: 'Characters' });
@@ -290,6 +290,20 @@ router.get('/characters/:characterId/edit', isAuthenticated, function (req, res,
     }).catch(function (err) {});
 });
 
+router.get('/characters/:characterId/delete', isAuthenticated, function (req, res, next) {
+    Character.findOne({ _id: req.params.characterId }).then(function (character) {
+        if (character.user == req.session.user._id) {
+            character.remove().then(function () {
+                res.redirect('/users/mycharacters');
+            });
+        } else {
+            Promise.reject(new Error('You are not owner of this character'));
+        }
+    }).catch(function (err) {
+        console.log(err.message);
+    });
+});
+
 router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
     Promise.all([Item.findOne({ _id: req.params.itemId })]).then(function (doc) {
         res.render('users/newitem', {
@@ -300,6 +314,19 @@ router.get('/items/:itemId/edit', isAuthenticated, function (req, res, next) {
     }).catch(function (err) {});
 });
 
+router.get('/items/:itemId/delete', isAuthenticated, function (req, res, next) {
+    Item.findOne({ _id: req.params.itemId }).then(function (item) {
+        if (item.user == req.session.user._id) {
+            item.remove().then(function () {
+                res.redirect('/users/myitems');
+            });
+        } else {
+            Promise.reject(new Error('You are not owner of this item'));
+        }
+    }).catch(function (err) {
+        console.log(err.message);
+    });
+});
 router.get('/mygroups', isAuthenticated, function (req, res, next) {
 
     Promise.all([Group.find({ users: req.session.user }), Group.find({ owner: req.session.user })]).then(function (doc) {

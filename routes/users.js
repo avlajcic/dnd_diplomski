@@ -483,6 +483,30 @@ router.get('/groups/:groupId/leave', isAuthenticated, function (req, res, next) 
 
 });
 
+
+router.get('/groups/:groupId/kick/:userId', isAuthenticated, function (req, res, next) {
+    Promise.all([
+        Group.findOne({_id: req.params.groupId}).populate('owner').populate('users').exec(),
+        User.findOne({_id: req.params.userId})
+    ]).then(function (doc) {
+        var group = doc[0];
+        var user = doc[1];
+
+        if (req.session.user._id == group.owner._id){
+            group.users.pull(user);
+            group.save().then(function () {
+                res.redirect('/users/groups/' + group._id);
+            });
+        }else{
+            res.redirect('/users/groups/' + group._id);
+        }
+    }).catch(function (err) {
+
+    });
+
+});
+
+
 router.get('/groups/:groupId/delete', isAuthenticated, function (req, res, next) {
     Group.findOne({_id: req.params.groupId}).then(function (group) {
         group.remove().then(function () {

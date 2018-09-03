@@ -1,22 +1,51 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-  <h1>{{user.username}}'s characters</h1>
+    <h1>{{ user.username }}'s characters</h1>
 
-  <div class="row">
-    <div class="col-sm-6">
-      <a href="/users/newcharacter" class="profile-tab">
-        <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
-        <h3>New character</h3>
-      </a>
+    <div class="row">
+        <div class="col-sm-6">
+            <a href="/users/newcharacter" class="profile-tab">
+                <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
+                <h3>New character</h3>
+            </a>
+        </div>
     </div>
-  </div>
+    <div class="row list-items">
+        <div class="col-sm-2">
+            <b>Name</b>
+        </div>
+        <div class="col-sm-2">
+            <b>Class</b>
+        </div>
+        <div class="col-sm-2">
+            <b>Race</b>
+        </div>
+        <div class="col-sm-2">
+            <b>Level</b>
+        </div>
+    </div>
     {% if characters is defined %}
-      <ul>
-          {% for character in characters %}
-            <li><a href="/users/characters/{{ character._id }}/edit">{{ character.name|e }}</a></li>
-          {% endfor %}
-      </ul>
+        {% for character in characters %}
+            <div class="row list-items">
+                <div class="col-sm-2">
+                    {{ character.name|e }}
+                </div>
+                <div class="col-sm-2">
+                    {{ character.class.name|e }}
+                </div>
+                <div class="col-sm-2">
+                    {{ character.race.name|e }}
+                </div>
+                <div class="col-sm-2">
+                    {{ character.level|e }}
+                </div>
+                <div class="col-sm-4">
+                    <a class="btn btn-primary" href="/users/characters/{{ character._id }}/edit">Edit</a>
+                    <a class="btn btn-danger" href="/users/characters/{{ character._id }}/delete">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
     {% endif %}
 
 {% endblock %}

@@ -38,7 +38,12 @@
                     {% for member in group.users %}
                         {% if loop.index0 % 3 == 0 %}<div class="row">{% endif %}
 
-                        <div class="col member-info">{{ member.username }}</div>
+                        <div class="col member-info">
+                            {{ member.username }}
+                            {% if user._id == group.owner and member._id != user._id  %}
+                                <a class="btn btn-danger" href="/users/groups/{{ group._id }}/kick/{{ member._id }}">Kick</a>
+                            {% endif %}
+                        </div>
 
                         {% if loop.index0 % 3 == 2 or loop.last %}</div>{% endif %}
                     {% endfor %}

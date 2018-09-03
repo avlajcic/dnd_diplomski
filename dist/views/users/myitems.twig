@@ -11,12 +11,36 @@
       </a>
     </div>
   </div>
+
+  <div class="row list-items">
+    <div class="col-sm-4">
+      <b>Name</b>
+    </div>
+    <div class="col-sm-2">
+      <b>Type</b>
+    </div>
+    <div class="col-sm-2">
+      <b>Votes</b>
+    </div>
+  </div>
     {% if items is defined %}
-      <ul>
-          {% for item in items %}
-            <li><a href="/users/items/{{ item._id }}/edit">{{ item.name|e }}</a></li>
-          {% endfor %}
-      </ul>
+        {% for item in items %}
+          <div class="row list-items">
+            <div class="col-sm-4">
+                {{ item.name|e }}
+            </div>
+            <div class="col-sm-2">
+                {{ item.type|e }}
+            </div>
+            <div class="col-sm-2">
+                {{ item.votes|e }}
+            </div>
+            <div class="col-sm-4">
+              <a class="btn btn-primary" href="/users/items/{{ item._id }}/edit">Edit</a>
+              <a class="btn btn-danger" href="/users/items/{{ item._id }}/delete">Delete</a>
+            </div>
+          </div>
+        {% endfor %}
     {% endif %}
 
 {% endblock %}
