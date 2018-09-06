@@ -34,25 +34,12 @@
         <div class="col-sm-8">
             <div class="row">
                 <div class="col-sm-12">
-                    <h3>Group members</h3>
-                    {% for member in group.users %}
-                        {% if loop.index0 % 3 == 0 %}<div class="row">{% endif %}
-
-                        <div class="col member-info">{{ member.username }}</div>
-
-                        {% if loop.index0 % 3 == 2 or loop.last %}</div>{% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="col-sm-12">
                     <ul class="nav nav-pills">
                         <li class="nav-item">
                             <a data-toggle="pill" class="nav-link active" href="#trade">Trade</a>
                         </li>
                         <li class="nav-item">
-                            <a data-toggle="pill" class="nav-link" href="#files">Files</a>
+                            <a data-toggle="pill" class="nav-link" href="#members">Members</a>
                         </li>
                     </ul>
                 </div>
@@ -110,9 +97,21 @@
                     </form>
                 </div>
 
-                <div id="files" class="row tab-pane fade">
+                <div id="members" class="row tab-pane fade">
                     <div class="col-sm-12">
-                        Some files text
+                        <h3>Group members</h3>
+                        {% for member in group.users %}
+                            {% if loop.index0 % 3 == 0 %}<div class="row">{% endif %}
+
+                            <div class="col member-info">
+                                {{ member.username }}
+                                {% if user._id == group.owner and member._id != user._id  %}
+                                    <a class="btn btn-danger" href="/users/groups/{{ group._id }}/kick/{{ member._id }}">Kick</a>
+                                {% endif %}
+                            </div>
+
+                            {% if loop.index0 % 3 == 2 or loop.last %}</div>{% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
