@@ -1,19 +1,30 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    {% if error is defined %}
-        <p>{{ error }}</p>
-    {% endif %}
-    <h2>Login form</h2>
-    <div class="signup-form">
-        <form action="/users/login" method="post">
+    <div class="container">
+        <div class="row">
+            <div class="offset-2 col-8 content-div">
+                {% if error is defined %}
+                    <p>{{ error }}</p>
+                {% endif %}
+                <div class="text-center">
+                    <h2>Login to your account</h2>
+                    <p class="info-text">Don't have an account? <a href="/signup">Sing up for free!</a> </p>
+                </div>
+                <div class="signup-form">
+                    <form action="/users/login" method="post">
 
-            <input type="text" placeholder="Username or email" name="usernameOrEmail" class="form-control" required> <br><br>
+                        <input type="text" placeholder="Username or email" name="usernameOrEmail" class="form-control smaller-input center-element"
+                               required> <br><br>
 
-            <input type="password" placeholder="Password" name="password" class="form-control" required> <br><br>
+                        <input type="password" placeholder="Password" name="password" class="form-control smaller-input center-element" required>
+                        <br><br>
 
 
-            <input type="submit" value="Login!" class="btn btn-success">
-        </form>
+                        <input type="submit" value="Login!" class="btn-lg btn-success login-form-button center-element" id="login-btn">
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

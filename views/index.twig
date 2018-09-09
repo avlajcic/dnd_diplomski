@@ -1,94 +1,140 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <h1>{{ title }}</h1>
-    <p>Welcome {% if user is defined %} {{ user.username }} {% endif %}to {{ title }}</p>
+    <div id="landing-image">
+        <div id="landing-content" class="text-center">
+            <h1>Welcome to Dungeons & Dragons <br> online companion app!</h1>
+            {% if user is not defined %}
+                <div id="landing-buttons">
+                    <a class="btn-lg btn-danger landing-btn" href="/signup">Register</a>
+                    <a class="btn-lg btn-primary landing-btn" id="login-btn" href="/login">Login</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col text-center landing-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent metus neque, pharetra id orci vitae,
+                pretium euismod leo. Proin quis elementum diam. Sed lacinia consectetur purus, ut consectetur eros
+                convallis
+                in. Aenean ut turpis porta, sodales lacus eget, accumsan diam. Nulla facilisi. Mauris sagittis feugiat
+                eleifend. Mauris ultricies tellus quis pellentesque posuere. Nam dapibus massa at ligula scelerisque
+                feugiat.
+            </div>
+        </div>
+    </div>
 
-    <hr>
-    <div class="row">
-        <div class="col">
-            <h4 class="text-center">Latest items</h4>
-            {% for item in latestItems %}
-                <div class="row">
-                    <div class="col-1">
-                        {% if item.type == 'weapon' %}
-                            <img class="item-icon" src="/images/weapons_icon.png">
-                        {% elseif item.type == 'armor'%}
-                            <img class="item-icon" src="/images/armor_icon.png">
-                        {% else %}
-                            <img class="item-icon" src="/images/misc_icon.png">
-                        {% endif %}
+    <div id="statistic">
+        <div class="container-fluid stats-container">
+            <div class="row">
+                <div class="col">
+                    <h4 id="latest-items">LATEST ITEMS</h4>
+
+                    <div class="row">
+                        <div class="col-6 item-heading">
+                            NAME
+                        </div>
+                        <div class="col-4 item-heading">
+                            TYPE
+                        </div>
+                        <div class="col-2 item-heading">
+                            VOTES
+                        </div>
                     </div>
-                    <div class="col">
-                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
-                    </div>
-                    <div class="col-2">
-                        {{ item.votes }}
-                    </div>
+                    <hr class="item-separator">
+
+                    {% for item in latestItems %}
+                        <div class="row item-description">
+                            <div class="col-6">
+                                <a href="/items/{{ item._id }}"> {{ item.name|e }} </a>
+                            </div>
+                            <div class="col-4">
+                                <p>{{ item.type|capitalize|e }}</p>
+                            </div>
+                            <div class="col-2 text-right">
+                                {{ item.votes }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col text-center">
+                                <p>/</p>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="row">
-                    <div class="col text-center">
-                        /
+                <div class="col">
+                    <h4 id="hottest-items">HOTTEST ITEMS</h4>
+                    <div class="row">
+                        <div class="col-6 item-heading">
+                            NAME
+                        </div>
+                        <div class="col-4 item-heading">
+                            TYPE
+                        </div>
+                        <div class="col-2 item-heading">
+                            VOTES
+                        </div>
                     </div>
+                    <hr class="item-separator">
+
+                    {% for item in hottestToday %}
+                        <div class="row item-description">
+                            <div class="col-6">
+                                <a href="/items/{{ item._id }}"> {{ item.name|e }} </a>
+                            </div>
+                            <div class="col-4">
+                                <p>{{ item.type|capitalize|e }}</p>
+                            </div>
+                            <div class="col-2 text-right">
+                                {{ item.votes }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col text-center">
+                                /
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        </div>
-        <div class="col">
-            <h4 class="text-center">Hottest items today</h4>
-            {% for item in hottestToday %}
-                <div class="row">
-                    <div class="col-1">
-                        {% if item.type == 'weapon' %}
-                            <img class="item-icon" src="/images/weapons_icon.png">
-                        {% elseif item.type == 'armor'%}
-                            <img class="item-icon" src="/images/armor_icon.png">
-                        {% else %}
-                            <img class="item-icon" src="/images/misc_icon.png">
-                        {% endif %}
+                <div class="col">
+                    <h4 id="voted-items">MOST VOTED ITEMS</h4>
+                    <div class="row">
+                        <div class="col-6 item-heading">
+                            NAME
+                        </div>
+                        <div class="col-4 item-heading">
+                            TYPE
+                        </div>
+                        <div class="col-2 item-heading">
+                            VOTES
+                        </div>
                     </div>
-                    <div class="col">
-                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
-                    </div>
-                    <div class="col-2">
-                        {{ item.votes }}
-                    </div>
+                    <hr class="item-separator">
+
+                    {% for item in mostVoted %}
+                        <div class="row item-description">
+                            <div class="col-6">
+                                <a href="/items/{{ item._id }}"> {{ item.name|e }} </a>
+                            </div>
+                            <div class="col-4">
+                                <p>{{ item.type|capitalize|e }}</p>
+                            </div>
+                            <div class="col-2 text-right">
+                                {{ item.votes }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col text-center">
+                                /
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="row">
-                    <div class="col text-center">
-                        /
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        <div class="col">
-            <h4 class="text-center">Most voted items</h4>
-            {% for item in mostVoted %}
-                <div class="row">
-                    <div class="col-1">
-                        {% if item.type == 'weapon' %}
-                            <img class="item-icon" src="/images/weapons_icon.png">
-                        {% elseif item.type == 'armor'%}
-                            <img class="item-icon" src="/images/armor_icon.png">
-                        {% else %}
-                            <img class="item-icon" src="/images/misc_icon.png">
-                        {% endif %}
-                    </div>
-                    <div class="col">
-                        <a href="/items/{{ item._id }}"> {{ item.name }} </a>
-                    </div>
-                    <div class="col-2">
-                        {{ item.votes }}
-                    </div>
-                </div>
-            {% else %}
-                <div class="row">
-                    <div class="col text-center">
-                        /
-                    </div>
-                </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
 

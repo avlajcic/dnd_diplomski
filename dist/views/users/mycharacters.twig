@@ -1,51 +1,81 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <h1>{{ user.username }}'s characters</h1>
+    <div class="container">
+        <div class="row">
+            <div class="offset-2 col-8 content-div">
+                <div class="text-center">
+                    <h1>{{ user.username|upper }}'S CHARACTERS</h1>
+                    <p class="info-text">View, edit, delete and create new D&D characters for your games</p>
 
-    <div class="row">
-        <div class="col-sm-6">
-            <a href="/users/newcharacter" class="profile-tab">
-                <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
-                <h3>New character</h3>
-            </a>
-        </div>
-    </div>
-    <div class="row list-items">
-        <div class="col-sm-2">
-            <b>Name</b>
-        </div>
-        <div class="col-sm-2">
-            <b>Class</b>
-        </div>
-        <div class="col-sm-2">
-            <b>Race</b>
-        </div>
-        <div class="col-sm-2">
-            <b>Level</b>
-        </div>
-    </div>
-    {% if characters is defined %}
-        {% for character in characters %}
-            <div class="row list-items">
-                <div class="col-sm-2">
-                    {{ character.name|e }}
                 </div>
-                <div class="col-sm-2">
-                    {{ character.class.name|e }}
-                </div>
-                <div class="col-sm-2">
-                    {{ character.race.name|e }}
-                </div>
-                <div class="col-sm-2">
-                    {{ character.level|e }}
-                </div>
-                <div class="col-sm-4">
-                    <a class="btn btn-primary" href="/users/characters/{{ character._id }}/edit">Edit</a>
-                    <a class="btn btn-danger" href="/users/characters/{{ character._id }}/delete">Delete</a>
+                <div class="row">
+                    <div class="col">
+                        <a href="/users/newcharacter" class="profile-tab center-element-link">
+                            <i class="fa fa-plus-circle fa-3x" aria-hidden="true" style="width:100%"></i>
+                            <h3>New character</h3>
+                        </a>
+                    </div>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
+        </div>
+    </div>
+    <div class="container-fluid text-18 list-items">
+        <div class="row top-padding">
+            <div class="col-10 offset-1 ">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <b>NAME</b>
+                    </div>
+                    <div class="col-sm-3">
+                        <b>CLASS</b>
+                    </div>
+                    <div class="col-sm-2">
+                        <b>RACE</b>
+                    </div>
+                    <div class="col-sm-2">
+                        <b>LEVEL</b>
+                    </div>
+                    <div class="row separator">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if characters is defined %}
+            {% for character in characters %}
+                <div class="row">
+                    <div class="col-10 offset-1 items">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                {{ character.name|e }}
+                            </div>
+                            <div class="col-sm-3">
+                                {{ character.class.name|e }}
+                            </div>
+                            <div class="col-sm-2">
+                                {{ character.race.name|e }}
+                            </div>
+                            <div class="col-sm-2">
+                                {{ character.level|e }}
+                            </div>
+                            <div class="col-sm-2 button-margin">
+                                <a class="icon" href="/users/characters/{{ character._id }}/edit"><i
+                                            class="fa fa-pencil" aria-hidden="true"></i>
+                                </a>
+                                <a class="icon" href="/users/characters/{{ character._id }}/delete"><i
+                                            class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row separator">
 
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="extra-height"></div>
+        </div>
+    </div>
 {% endblock %}

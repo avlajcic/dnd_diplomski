@@ -1,48 +1,90 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <h1>{{ user.username }}'s groups</h1>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <a href="/users/newgroup" class="profile-tab">
-                <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
-                <h3>New group</h3>
-            </a>
+    <div class="container">
+        <div class="row">
+            <div class="offset-2 col-8 content-div">
+                <div class="text-center">
+                    <h1>GROUPS</h1>
+                    <p class="info-text">View, edit and delete groups you own, view and leave from groups you’re a
+                        member of, or create new groups</p>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <a href="/users/newgroup" class="profile-tab center-element-link">
+                            <i class="fa fa-plus-circle fa-3x" aria-hidden="true" style="width:100%"></i>
+                            <h3>New group</h3>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <h3>Owner</h3>
-            {% if ownerGroups is defined %}
-                {% for group in ownerGroups %}
-                    <div class="row list-items">
-                        <div class="col-sm-8">
-                            <a href="/users/groups/{{ group._id }}">{{ group.name|e }}</a>
+    <div class="container-fluid text-18 list-items">
+        <div class="row top-padding">
+            <div class="col-sm-4 offset-1">
+                <b>OWNER</b>
+                <div class="row separator"></div>
+            </div>
+            <div class="col-sm-4 offset-2">
+                <b>MEMBER</b>
+                <div class="row separator"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 offset-1">
+                {% if ownerGroups is defined %}
+                    {% for group in ownerGroups %}
+                        <div class="row list-items">
+                            <div class="col-12 items">
+                                <div class="row">
+                                    <div class="col-sm-8 button-margin">
+                                        <a href="/users/groups/{{ group._id }}">{{ group.name|e }}</a>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <a class="icon" href="/users/groups/{{ group._id }}/edit"><i
+                                                    class="fa fa-pencil" aria-hidden="true"></i></a>
+                                        <a class="icon" href="/users/groups/{{ group._id }}/delete"><i
+                                                    class="fa fa-trash" aria-hidden="true"></i></a>
+                                    </div>
+                                </div>
+                                <div class="row separator">
+
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-sm-4">
-                            <a class="btn btn-primary" href="/users/groups/{{ group._id }}/edit">Edit</a>
-                            <a class="btn btn-danger" href="/users/groups/{{ group._id }}/delete">Delete</a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="col-sm-4 offset-2">
+                {% if allGroups is defined %}
+                    {% for group in allGroups %}
+                        <div class="row list-items">
+                            <div class="col-12 items">
+                                <div class="row">
+                                    <div class="col-sm-8 button-margin">
+                                        <a href="/users/groups/{{ group._id }}">{{ group.name|e }}</a>
+                                    </div>
+                                    <div class="col-sm-4">
+
+                                        <a class="icon" href="/users/groups/{{ group._id }}/leave">
+                                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row separator">
+
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
 
-        <div class="col-sm-6">
-            <h3>Member</h3>
-            {% if allGroups is defined %}
-                {% for group in allGroups %}
-                    <div class="row list-items">
-                        <div class="col-sm-8">
-                            <a href="/users/groups/{{ group._id }}">{{ group.name|e }}</a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a class="btn btn-danger" href="/users/groups/{{ group._id }}/leave">Leave</a>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        <div class="row">
+            <div class="extra-height"></div>
         </div>
     </div>
 {% endblock %}

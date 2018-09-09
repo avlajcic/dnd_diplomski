@@ -1,62 +1,116 @@
 {% extends 'layout.twig' %}
 
-{% block body %}
-    <h1>{{ user.username }}'s friends</h1>
-
-    <div class="row">
-        <div class="col">
-            <div class="text-center" id="form-success">
-
-            </div>
-            <div class="text-center" id="form-error">
-
-            </div>
-            <form action="/users/addfriend" method="post" id="new-friend-form">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <input type="text" name="friend" class="form-control" placeholder="Friends username...">
-                    </div>
-                    <div class="col-sm-6">
-                        <input type="submit" class="btn btn-success" value="Send invite">
+    {% block body %}
+        <div class="container">
+            <div class="row">
+                <div class="offset-2 col-8 content-div">
+                    <div class="text-center">
+                        <h1>FRIENDS</h1>
+                        <p class="info-text">Invite other players to become your friends, view and edit your friends
+                            list</p>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
-    <hr>
-    {% if invites is defined and invites.length > 0 %}
-    <div class="row">
-        <div class="col-sm-12">
-            <h3>You have new friend invites!</h3>
-            {% for invite in invites %}
-                <div class="row" id="invite_{{ invite._id }}">
-                    <div class="col-sm-8">
-                        {{ invite.from.username }}
-                    </div>
-                    <div class="col">
-                        <button class="btn btn-success" onclick="acceptInv('{{ invite._id }}')">Accept</button>
-                        <button class="btn btn-danger" onclick="removeInv('{{ invite._id }}')">Remove</button>
-                    </div>
+        <div class="container-fluid text-18 list-items">
+            <div class="row top-padding">
+                <div class="col-4 offset-1">
+                    <b>NAME</b>
+                    <div class="row separator"></div>
                 </div>
+                <div class="col-4 offset-2">
+                    <b>INVITE A FRIEND</b>
+                    <div class="row separator"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4 offset-1">
+                    {% for friend in friends %}
+                        <div class="row list-items">
+                            <div class="col-12 items">
+                                <div class="row">
+                                    <div class="col-8 button-margin">
+                                        {{ friend.username|e }}
+                                    </div>
+                                    <div class="col-4">
+                                        <a class="icon" href="/users/friends/{{ friend._id }}/remove"><i
+                                                    class="fa fa-trash" aria-hidden="true"></i></a>
+                                    </div>
+                                </div>
+                                <div class="row separator">
 
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-    <div class="row">
-        <div class="col-sm-12">
-                {% for friend in friends %}
-                    {% if loop.index0 % 3 == 0 %}<div class="row">{% endif %}
-                        <div class="col member-info">
-                            {{ friend.username|e }}
-                            <a class="btn btn-danger" href="/users/friends/{{ friend._id }}/remove">Remove</a>
+                                </div>
+                            </div>
                         </div>
-                    {% if loop.index0 % 3 == 2 or loop.last %}</div>{% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <div class="col-4 offset-2">
+
+                    <div class="row list-items">
+                        <div class="col-12 items">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="text-center" id="form-success">
+
+                                    </div>
+                                    <div class="text-center" id="form-error">
+
+                                    </div>
+                                    <form action="/users/addfriend" method="post" id="new-friend-form">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="text" name="friend" class="form-control"
+                                                       placeholder="Friends username...">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="submit" class="btn btn-success button-margin login-form-button" id="login-btn" value="Send invite">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if invites is defined and invites.length > 0 %}
+                <div class="row">
+                    <div class="col-4 offset-1">
+                        <b>INVITES</b>
+                        <div class="row separator"></div>
+                    </div>
+                </div>
+                <div class="row items">
+                    <div class="col-4 offset-1">
+                        {% for invite in invites %}
+                            <div class="row" id="invite_{{ invite._id }}">
+                                <div class="col-8">
+                                    {{ invite.from.username }}
+                                </div>
+                                <div class="col button-margin">
+                                    <button class="btn btn-success" onclick="acceptInv('{{ invite._id }}')">Accept
+                                    </button>
+                                    <button class="btn btn-danger" onclick="removeInv('{{ invite._id }}')">Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row separator">
+
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="row">
+                <div class="extra-height"></div>
+            </div>
         </div>
-    </div>
+    {% endblock %}
 
 
+{% block javascript %}
     <script>
         var friendForm = $('#new-friend-form');
         var successDiv = $('#form-success');
@@ -69,7 +123,7 @@
             successDiv.hide();
             errorDiv.hide();
 
-            $('.error').each(function() {
+            $('.error').each(function () {
                 $(this).remove();
             });
 
@@ -115,5 +169,24 @@
             });
         }
     </script>
-
 {% endblock %}
+    {##}
+    {#{% if invites is defined and invites.length > 0 %}#}
+    {#<div class="row">#}
+        {#<div class="col-12">#}
+            {#<h3>You have new friend invites!</h3>#}
+            {#{% for invite in invites %}#}
+                {#<div class="row" id="invite_{{ invite._id }}">#}
+                    {#<div class="col-8">#}
+                        {#{{ invite.from.username }}#}
+                    {#</div>#}
+                    {#<div class="col">#}
+                        {#<button class="btn btn-success" onclick="acceptInv('{{ invite._id }}')">Accept</button>#}
+                        {#<button class="btn btn-danger" onclick="removeInv('{{ invite._id }}')">Remove</button>#}
+                    {#</div>#}
+                {#</div>#}
+
+            {#{% endfor %}#}
+        {#</div>#}
+    {#</div>#}
+    {#{% endif %}#}

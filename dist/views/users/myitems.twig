@@ -1,46 +1,76 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-  <h1>{{user.username}}'s items</h1>
+    <div class="container">
+        <div class="row">
+            <div class="offset-2 col-8 content-div">
+                <div class="text-center">
+                    <h1>{{ user.username|upper }}'S ITEMS</h1>
+                    <p class="info-text">View, edit, delete and create new items for your playable characters</p>
 
-  <div class="row">
-    <div class="col-sm-6">
-      <a href="/users/newitem" class="profile-tab">
-        <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="width:100%"></i>
-        <h3>New item</h3>
-      </a>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <a href="/users/newitem" class="profile-tab center-element-link">
+                            <i class="fa fa-plus-circle fa-3x" aria-hidden="true" style="width:100%"></i>
+                            <h3>New item</h3>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="container-fluid text-18 list-items">
+        <div class="row top-padding">
+            <div class="col-10 offset-1">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <b>NAME</b>
+                    </div>
+                    <div class="col-sm-4">
+                        <b>TYPE</b>
+                    </div>
+                    <div class="col-sm-2">
+                        <b>VOTES</b>
+                    </div>
+                    <div class="row separator">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if items is defined %}
+            {% for item in items %}
+                <div class="row ">
+                    <div class="col-10 offset-1 items">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                {{ item.name|e }}
+                            </div>
+                            <div class="col-sm-4">
+                                {{ item.type|capitalize }}
+                            </div>
+                            <div class="col-sm-2">
+                                {{ item.votes|e }}
+                            </div>
+                            <div class="col-sm-2 button-margin">
+                                <a class="icon" href="/users/items/{{ item._id }}/edit"><i
+                                            class="fa fa-pencil" aria-hidden="true"></i>
+                                </a>
+                                <a class="icon" href="/users/items/{{ item._id }}/delete"><i
+                                            class="fa fa-trash" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row separator">
 
-  <div class="row list-items">
-    <div class="col-sm-4">
-      <b>Name</b>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="extra-height"></div>
+        </div>
     </div>
-    <div class="col-sm-2">
-      <b>Type</b>
-    </div>
-    <div class="col-sm-2">
-      <b>Votes</b>
-    </div>
-  </div>
-    {% if items is defined %}
-        {% for item in items %}
-          <div class="row list-items">
-            <div class="col-sm-4">
-                {{ item.name|e }}
-            </div>
-            <div class="col-sm-2">
-                {{ item.type|capitalize  }}
-            </div>
-            <div class="col-sm-2">
-                {{ item.votes|e }}
-            </div>
-            <div class="col-sm-4">
-              <a class="btn btn-primary" href="/users/items/{{ item._id }}/edit">Edit</a>
-              <a class="btn btn-danger" href="/users/items/{{ item._id }}/delete">Delete</a>
-            </div>
-          </div>
-        {% endfor %}
-    {% endif %}
 
 {% endblock %}

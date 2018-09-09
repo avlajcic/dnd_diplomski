@@ -1,16 +1,18 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <h1>New group</h1>
-    <form id="newGroupForm" method="post" action="/users/group">
+    <div class="container content-div">
+        <h1>New group</h1>
+        <form id="newGroupForm" method="post" action="/users/group">
             <div class="row">
                 <div class="col-10">
                     <label for="group-name">Name</label>
-                    <input class="form-control" type="text" id="group-name" name="name" placeholder="Enter group name..."
+                    <input class="form-control" type="text" id="group-name" name="name"
+                           placeholder="Enter group name..."
                             {% if group is defined %}
                                 value="{{ group.name }}"
                             {% endif %}
-                            required>
+                           required>
                     <br>
 
                     <div class="form-group">
@@ -30,16 +32,17 @@
                         </select>
                     </div>
                     {% if group is defined %}
-                        <input type="hidden" name="groupId" value="{{ group._id }}" >
+                        <input type="hidden" name="groupId" value="{{ group._id }}">
                     {% endif %}
                     <div style="overflow:auto;" class="offset-sm-8">
-                        <input type="submit" class="btn btn-success" value="Submit">
+                        <input type="submit" class="btn-lg btn-success center-element-link login-form-button" value="Create" id="login-btn">
                     </div>
                 </div>
             </div>
 
-    </form>
+        </form>
 
+    </div>
     <script src='/javascripts/chosen/chosen.jquery.min.js'></script>
 
     <script>

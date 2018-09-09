@@ -1,22 +1,32 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
+<div class="container">
+    <div class="row">
+        <div class="offset-2 col-8 content-div">
     {% if error is defined %}
         <p>{{ error }}</p>
     {% endif %}
-    <h2>Sign up form</h2>
+    <div class="text-center">
+        <h2>Ready to play?</h2>
+        <h2>Open your free account now!</h2>
+        <p class="info-text">Already have an account? <a href="/login">Login here!</a> </p>
+    </div>
     <div class="signup-form">
         <form action="/users/signup" method="post">
 
-            <input type="text" placeholder="Username" name="username" class="form-control" required> <br><br>
+            <input type="text" placeholder="Username" name="username" class="form-control smaller-input center-element" required> <br><br>
 
-            <input type="email" placeholder="Email" name="email" class="form-control" required> <br><br>
+            <input type="email" placeholder="Email" name="email" class="form-control smaller-input center-element" required> <br><br>
 
-            <input type="password" placeholder="Password" name="password" class="form-control" required> <br><br>
+            <input type="password" placeholder="Password" name="password" class="form-control smaller-input center-element" required> <br><br>
 
-            <input type="password" placeholder="Confirm password" name="password_conf" class="form-control" required> <br><br>
+            <input type="password" placeholder="Confirm password" name="password_conf" class="form-control smaller-input center-element" required> <br><br>
 
-            <input type="submit" value="Sign up!" class="btn btn-success">
+            <input type="submit" value="Sign up!" class="btn btn-success login-form-button center-element" id="login-btn">
         </form>
     </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
